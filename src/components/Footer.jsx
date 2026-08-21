@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from 'react-router-dom';
+
+// ─── IMAGES IMPORT ───
+import logoImage from '../assets/logo.png';
+
 /* ═══════════════════════════════════════════════════
    BRAND TOKENS (Modern Navy Blue & Orange)
 ═══════════════════════════════════════════════════ */
@@ -320,8 +324,9 @@ const Footer = () => {
             {/* Column 1: Brand */}
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <motion.div variants={itemAnim}>
+                {/* UPDATED: Using imported logoImage */}
                 <img
-                  src="src/assets/logo.png"
+                  src={logoImage}
                   alt="G.Incube Logo"
                   style={{
                     maxHeight: "70px",
@@ -532,30 +537,28 @@ const Footer = () => {
               .
             </p>
             <div style={{ display: "flex", gap: 24 }}>
-          
-
-<Link
-  to="/privacy-policy"
-  style={{
-    color: C.muted,
-    textDecoration: "none",
-    fontSize: 13.5,
-    fontWeight: 500,
-  }}
->
-  Privacy Policy
-</Link>
-<Link
-  to="/terms-conditions"
-  style={{
-    color: C.muted,
-    textDecoration: "none",
-    fontSize: 13.5,
-    fontWeight: 500,
-  }}
->
-  Terms of Service
-</Link>
+              <Link
+                to="/privacy-policy"
+                style={{
+                  color: C.muted,
+                  textDecoration: "none",
+                  fontSize: 13.5,
+                  fontWeight: 500,
+                }}
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/terms-conditions"
+                style={{
+                  color: C.muted,
+                  textDecoration: "none",
+                  fontSize: 13.5,
+                  fontWeight: 500,
+                }}
+              >
+                Terms of Service
+              </Link>
             </div>
           </motion.div>
         </div>

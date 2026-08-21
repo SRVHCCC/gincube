@@ -1,6 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useAnimation, animate } from 'framer-motion';
 
+// ─── IMAGES IMPORT ───
+import logoImage from '../assets/logo.png';
+import office1Image from '../assets/Office1.png';
+import office2Image from '../assets/Office2.png';
+
 /* ─────────────────────────────────────────
    BRAND TOKENS (Modernized Navy Blue & Golden Orange)
 ───────────────────────────────────────── */
@@ -310,7 +315,8 @@ const WhoWeAre = () => (
           }}
         >
           <div style={{ background: C.white, borderRadius: 12, padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(27, 70, 113, 0.08)' }}>
-            <img src="src/assets/logo.png" alt="Gwalior Smart City" style={{ height: 48, width: 'auto', display: 'block' }}
+            {/* UPDATED: Using imported logoImage */}
+            <img src={logoImage} alt="Gwalior Smart City" style={{ height: 48, width: 'auto', display: 'block' }}
               onError={e => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<span style="font-size:24px;font-weight:900;color:#1B4671;">G</span>`; }} />
           </div>
           <div style={{ width: 1, height: 48, background: `linear-gradient(180deg, transparent, ${C.pale}, transparent)` }} />
@@ -338,12 +344,14 @@ const WhoWeAre = () => (
         maxWidth: 1200, margin: '0 auto', marginTop: '-60px', position: 'relative', zIndex: 3
       }}>
         <Reveal delay={0.05} style={{ borderRadius: 24, overflow: 'hidden', height: 'clamp(240px, 30vw, 340px)', boxShadow: '0 20px 40px rgba(11, 30, 54, 0.1)' }}>
-          <motion.img src="src/assets/Office1.png" alt="G.Incube facility" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
+          {/* UPDATED: Using imported office1Image */}
+          <motion.img src={office1Image} alt="G.Incube facility" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={e => { e.target.parentElement.style.background = `linear-gradient(135deg,${C.lt},${C.pale})`; e.target.style.display = 'none'; }} />
         </Reveal>
         <Reveal delay={0.15} style={{ borderRadius: 24, overflow: 'hidden', height: 'clamp(240px, 30vw, 340px)', boxShadow: '0 20px 40px rgba(11, 30, 54, 0.1)' }}>
-          <motion.img src="src/assets/Office2.png" alt="G.Incube team" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
+          {/* UPDATED: Using imported office2Image */}
+          <motion.img src={office2Image} alt="G.Incube team" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={e => { e.target.parentElement.style.background = `linear-gradient(135deg,${C.pale},${C.lt})`; e.target.style.display = 'none'; }} />
         </Reveal>

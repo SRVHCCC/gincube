@@ -8,6 +8,10 @@ import {
 import { Menu, X, ChevronDown, ExternalLink, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
+// ─── IMAGES IMPORT ───
+import logoImage from "../assets/logo.png"; 
+import popupImage from "../assets/registeration.png";
+
 /* ─── Brand colors (Modern Navy Blue & Orange) ─── */
 const C = {
   primary: "#15436B", // Deep Navy Blue
@@ -31,12 +35,11 @@ const navLinks = [
     name: "About Us",
     dropdown: [{ name: "Who We Are", to: "/who-we-are" }],
   },
-    { name: "Events", to: "/GWEDC" },
+  { name: "Events", to: "/GWEDC" },
   { name: "Services", to: "/Services" },
   {
     name: "Join Gincube",
     dropdown: [
-      // Yahan href ki jagah 'to' use kiya hai taaki naye page par redirect ho
       { name: "Startup Registration", to: "/startup-registration" },
       { name: "Mentor Registration", to: "/mentor-registration" },
       { name: "Investor Registration", to: "/investor-registration" },
@@ -44,7 +47,7 @@ const navLinks = [
     ],
   },
   { name: "GWEDC", to: "/GWEDC" },
-    {
+  {
     name: "Policy",
     dropdown: [
       {
@@ -60,8 +63,8 @@ const navLinks = [
     ],
   },
   { name: "Contact Us", to: "/contact-us" },
-
 ];
+
 /* ══════════════════════════════════
    DROPDOWN PANEL
 ══════════════════════════════════ */
@@ -129,7 +132,7 @@ const DropdownMenu = ({ items }) => (
               width: "6px",
               height: "6px",
               borderRadius: "50%",
-              background: C.accent, // Changed to Orange for contrast
+              background: C.accent,
               flexShrink: 0,
             }}
           />
@@ -199,7 +202,7 @@ const PopupModal = ({ onClose }) => {
         style={{
           position: "absolute",
           inset: 0,
-          background: "rgba(10, 34, 54, 0.72)", // Dark navy tint
+          background: "rgba(10, 34, 54, 0.72)",
           backdropFilter: "blur(6px)",
         }}
       />
@@ -221,7 +224,6 @@ const PopupModal = ({ onClose }) => {
           boxShadow: `0 32px 80px rgba(21, 67, 107, 0.28), 0 8px 24px rgba(0,0,0,0.12)`,
         }}
       >
-        {/* Navy to Orange gradient top strip */}
         <div
           style={{
             height: "5px",
@@ -229,7 +231,6 @@ const PopupModal = ({ onClose }) => {
           }}
         />
 
-        {/* Close button */}
         <motion.button
           whileHover={{ scale: 1.12, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
@@ -256,15 +257,15 @@ const PopupModal = ({ onClose }) => {
           <X size={16} color={C.primary} />
         </motion.button>
 
-        {/* ── Actual flyer image ── */}
         <motion.div
           variants={itemVariants}
           initial="hidden"
           animate="visible"
           style={{ lineHeight: 0, overflow: "hidden" }}
         >
+          {/* UPDATED: using popupImage variable */}
           <motion.img
-            src="src/assets/registeration.png"
+            src={popupImage} 
             alt="Little CEOs of Gwalior"
             initial={{ scale: 1.06, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -273,14 +274,12 @@ const PopupModal = ({ onClose }) => {
           />
         </motion.div>
 
-        {/* ── Bottom CTA area ── */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           style={{ padding: "20px 22px 24px" }}
         >
-          {/* Pulse badge */}
           <motion.div
             variants={itemVariants}
             style={{
@@ -308,7 +307,7 @@ const PopupModal = ({ onClose }) => {
                   width: "7px",
                   height: "7px",
                   borderRadius: "50%",
-                  background: C.accent, // Orange Pulse
+                  background: C.accent,
                   animation: "pulse-dot 1.5s infinite",
                 }}
               />
@@ -316,7 +315,6 @@ const PopupModal = ({ onClose }) => {
             </span>
           </motion.div>
 
-          {/* Big CTA */}
           <motion.a
             variants={itemVariants}
             href={FORM_URL}
@@ -454,26 +452,21 @@ const Navbar = () => {
               height: "72px",
             }}
           >
-            {/* Logo */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => setIsPopupOpen(true)}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-              role="button"
-              aria-label="Open announcement"
-            >
-              <img
-                src="src/assets/logo.png"
-                alt="Gincube"
-                style={{ height: "40px", width: "auto" }}
-              />
-            </motion.div>
+            <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                aria-label="Go to Home"
+              >
+                {/* UPDATED: using logoImage variable */}
+                <img
+                  src={logoImage} 
+                  alt="Gincube"
+                  style={{ height: "40px", width: "auto" }}
+                />
+              </motion.div>
+            </Link>
 
             {/* Desktop nav */}
             <div
@@ -557,7 +550,7 @@ const Navbar = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
-                  background: `linear-gradient(135deg, ${C.primary}, #1C5A8F)`, // Navy Gradient
+                  background: `linear-gradient(135deg, ${C.primary}, #1C5A8F)`,
                   color: "#fff",
                   border: "none",
                   cursor: "pointer",

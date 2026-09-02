@@ -1,5 +1,12 @@
 import { motion, useMotionValue, useTransform, animate, useSpring } from 'framer-motion';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom'; // React Router DOM import kiya gaya hai
+
+// 👇 Yahan humne images ko import kiya hai
+import ruchikaImg from '../assets/gincube_ruchika.jpeg';
+import abhishekImg from '../assets/gincub_abhisek.jpeg';
+
+const MotionLink = motion(Link); // Framer Motion aur Link ko combine kiya gaya hai
 
 /* ═══════════════════════════════════════════════════
    BRAND TOKENS (Modern Navy Blue & Golden Orange)
@@ -23,7 +30,7 @@ const C = {
 };
 
 /* ═══════════════════════════════════════════════════
-   TYPEWRITER HOOK  (fixed, no stale-closure bugs)
+   TYPEWRITER HOOK  
 ═══════════════════════════════════════════════════ */
 const WORDS = ['Entrepreneurs', 'Innovators', 'Startups', 'Changemakers', 'Visionaries'];
 
@@ -120,16 +127,20 @@ const Particle = ({ x, y, size, color, delay, duration }) => (
 );
 
 /* ═══════════════════════════════════════════════════
-   SHIMMER BUTTON
+   SHIMMER BUTTON (Updated for React Router Link)
 ═══════════════════════════════════════════════════ */
-const ShimmerBtn = ({ children, href, onClick, secondary = false, style = {} }) => {
-  const Tag = href ? motion.a : motion.button;
+const ShimmerBtn = ({ children, to, href, onClick, secondary = false, style = {}, ...props }) => {
+  // Agar 'to' prop pass kiya hai, to React Router ka Link use hoga, varna normal button/anchor
+  const Tag = to ? MotionLink : (href ? motion.a : motion.button);
+  
   return (
     <Tag
+      to={to}
       href={href}
       onClick={onClick}
       whileHover={{ y: -3, scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
+      {...props} 
       style={{
         position: 'relative', overflow: 'hidden',
         display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -151,7 +162,6 @@ const ShimmerBtn = ({ children, href, onClick, secondary = false, style = {} }) 
         ...style,
       }}
     >
-      {/* shimmer sweep — only on primary */}
       {!secondary && (
         <motion.span
           style={{
@@ -187,7 +197,7 @@ const FloatingCard = ({ icon, title, sub, side, mouseX, mouseY, delay }) => {
         position: 'absolute',
         top: side === 'left' ? '30%' : '22%',
         [side]: 'clamp(12px, 4vw, 64px)',
-        display: 'none', // overridden below via className logic
+        display: 'none', 
         zIndex: 10,
         x: tx, y: ty,
       }}
@@ -217,7 +227,7 @@ const FloatingCard = ({ icon, title, sub, side, mouseX, mouseY, delay }) => {
 };
 
 /* ═══════════════════════════════════════════════════
-   WAVY SVG UNDERLINE (Updated to Orange)
+   WAVY SVG UNDERLINE
 ═══════════════════════════════════════════════════ */
 const WavyUnderline = () => (
   <motion.svg
@@ -261,17 +271,74 @@ const StatItem = ({ value, suffix, label, delay }) => (
 );
 
 /* ═══════════════════════════════════════════════════
-   PARTICLES CONFIG (Mixed Blue & Orange)
+   PROFILE CARD 
+═══════════════════════════════════════════════════ */
+const ProfileCard = ({ name, role, title, image, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+    whileHover={{ y: -6, boxShadow: '0 20px 48px rgba(21, 67, 107, 0.12)' }}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 22, 
+      background: 'rgba(255, 255, 255, 0.95)', 
+      backdropFilter: 'blur(12px)',
+      border: `1px solid ${C.pale}`,
+      borderRadius: 24, 
+      padding: '20px 28px', 
+      boxShadow: '0 10px 30px rgba(21, 67, 107, 0.08)',
+      textAlign: 'left',
+      flex: '1 1 400px', 
+      maxWidth: 500, 
+    }}
+  >
+    <div style={{
+      width: 84, height: 84, 
+      borderRadius: '50%',
+      overflow: 'hidden',
+      border: `3px solid ${C.accentLight}`,
+      flexShrink: 0,
+      background: C.lt,
+      boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+    }}>
+      <img
+        src={image}
+        alt={name}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </div>
+    
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: C.heading, lineHeight: 1.2 }}>
+        {name}
+      </p>
+      
+      <div style={{ width: 30, height: 3, background: C.accent, borderRadius: 3, margin: '6px 0' }} />
+      
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: C.primary, lineHeight: 1.4 }}>
+        {role}
+      </p>
+      <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 600, color: C.muted, lineHeight: 1.4 }}>
+        {title}
+      </p>
+    </div>
+  </motion.div>
+);
+
+/* ═══════════════════════════════════════════════════
+   PARTICLES CONFIG
 ═══════════════════════════════════════════════════ */
 const PARTICLES = [
   { x: 7,  y: 18, size: 10, color: 'rgba(21, 67, 107, 0.15)', delay: 0,   duration: 4.2 },
-  { x: 91, y: 13, size: 13, color: 'rgba(234, 159, 36, 0.25)', delay: 0.6, duration: 5.1 }, // Orange
+  { x: 91, y: 13, size: 13, color: 'rgba(234, 159, 36, 0.25)', delay: 0.6, duration: 5.1 }, 
   { x: 13, y: 78, size: 8,  color: 'rgba(40, 123, 190, 0.2)', delay: 1.1, duration: 3.7 },
   { x: 86, y: 72, size: 11, color: 'rgba(21, 67, 107, 0.12)', delay: 0.9, duration: 4.6 },
-  { x: 48, y: 88, size: 6,  color: 'rgba(234, 159, 36, 0.3)',  delay: 1.6, duration: 3.1 }, // Orange
+  { x: 48, y: 88, size: 6,  color: 'rgba(234, 159, 36, 0.3)',  delay: 1.6, duration: 3.1 }, 
   { x: 72, y: 28, size: 9,  color: 'rgba(28, 90, 143, 0.18)', delay: 0.4, duration: 4.9 },
   { x: 28, y: 45, size: 7,  color: 'rgba(21, 67, 107, 0.1)',  delay: 1.3, duration: 3.4 },
-  { x: 60, y: 10, size: 5,  color: 'rgba(234, 159, 36, 0.2)',  delay: 0.2, duration: 5.5 }, // Orange
+  { x: 60, y: 10, size: 5,  color: 'rgba(234, 159, 36, 0.2)',  delay: 0.2, duration: 5.5 }, 
 ];
 
 /* ═══════════════════════════════════════════════════
@@ -355,7 +422,7 @@ const Hero = () => {
           style={{
             position: 'absolute', bottom: -80, right: -100,
             width: 380, height: 380, borderRadius: '50%',
-            background: `radial-gradient(circle, rgba(234, 159, 36, 0.06) 0%, transparent 70%)`, // Orange Glow
+            background: `radial-gradient(circle, rgba(234, 159, 36, 0.06) 0%, transparent 70%)`,
             pointerEvents: 'none', zIndex: 0,
             x: useTransform(mouseX, v => v * 0.4),
             y: useTransform(mouseY, v => v * 0.4),
@@ -377,7 +444,7 @@ const Hero = () => {
           style={{
             position: 'absolute', bottom: -100, right: -100,
             width: 360, height: 360, borderRadius: '50%',
-            background: C.accent, opacity: 0.04, // Orange Blob
+            background: C.accent, opacity: 0.04, 
             filter: 'blur(50px)', pointerEvents: 'none', zIndex: 0,
           }}
           animate={{ scale: [1, 1.18, 1], rotate: [0, -22, 0] }}
@@ -446,7 +513,7 @@ const Hero = () => {
             >
               <h1 style={{
                 fontSize: 'clamp(36px, 7vw, 72px)',
-                fontWeight: 900, color: C.accent, // Now uses the Orange accent color
+                fontWeight: 900, color: C.accent, 
                 letterSpacing: '-1.5px', lineHeight: 1.07,
                 margin: 0, minHeight: '1.1em',
                 position: 'relative',
@@ -493,7 +560,7 @@ const Hero = () => {
               mentorship, and a launchpad to turn your boldest ideas into thriving ventures.
             </motion.p>
 
-            {/* CTA buttons */}
+            {/* 👇 UPDATED CTA BUTTONS TO ROUTE INTERNALLY 👇 */}
             <motion.div
               variants={fadeUp}
               style={{
@@ -502,7 +569,8 @@ const Hero = () => {
                 marginBottom: 56,
               }}
             >
-              <ShimmerBtn href="https://gincube.org/startup-registration">
+              {/* Button 1: Apply for Incubation */}
+              <ShimmerBtn to="/startup-registration">
                 Apply for Incubation
                 <motion.span
                   animate={{ x: [0, 5, 0] }}
@@ -512,7 +580,8 @@ const Hero = () => {
                 </motion.span>
               </ShimmerBtn>
 
-              <ShimmerBtn secondary>
+              {/* Button 2: Start Your Journey Now */}
+              <ShimmerBtn to="/startup-registration" secondary>
                 <span style={{
                   width: 30, height: 30, borderRadius: '50%',
                   background: C.accentPale,
@@ -520,9 +589,9 @@ const Hero = () => {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 13,
                 }}>
-                  ▶
+                  🚀
                 </span>
-                Watch Demo
+                Start Your Journey Now
               </ShimmerBtn>
             </motion.div>
 
@@ -560,17 +629,34 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
+          {/* ── BIGGER PROFESSIONAL LEADERSHIP PROFILES ── */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2, duration: 0.6 }}
+            transition={{ delay: 1.5, duration: 0.6 }}
             style={{
-              marginTop: 'clamp(48px, 6vw, 64px)',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', gap: 8,
+              marginTop: 'clamp(64px, 8vw, 80px)', 
+              display: 'flex', flexWrap: 'wrap',
+              justifyContent: 'center', gap: 32, 
             }}
           >
+            <ProfileCard
+              name="Ruchika Chauhan, IAS"
+              role="Collector Gwalior"
+              title="Chairman - Gwalior Smart City Incubation Center"
+              image={ruchikaImg} 
+              delay={1.4}
+            />
+            
+            <ProfileCard
+              name="Abhishek Chaudhari, IAS"
+              role="Commissioner Nagar Nigam Gwalior"
+              title="Vice Chairman - Gwalior Smart City Incubation Center"
+              image={abhishekImg}
+              delay={1.6}
+            />
           </motion.div>
+          
         </div>
       </section>
     </>

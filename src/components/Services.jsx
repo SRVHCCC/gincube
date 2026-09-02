@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView, useAnimation, animate } from 'framer-motion';
+// ADDED: Import Link from react-router-dom
+import { Link } from 'react-router-dom';
 
 /* ─────────────────────────────────────────
    BRAND TOKENS (Modernized Navy Blue & Golden Orange)
@@ -249,6 +251,9 @@ const ServiceCard = ({ service, index }) => {
    MAIN PAGE
 ══════════════════════════════ */
 const ServicesPage = () => {
+  // Motion-wrapped Link for React Router
+  const MotionLink = motion(Link);
+
   return (
     <section style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", color: C.heading, overflowX: 'hidden' }}>
       
@@ -349,8 +354,9 @@ const ServicesPage = () => {
               Join G.Incube and get access to all the services and mentorship designed specifically to take your startup from a simple idea to a massive scale.
             </p>
 
-            <motion.a
-              href="#startup"
+            {/* UPDATED: Changed href to 'to' and used MotionLink */}
+            <MotionLink
+              to="/startup-registration"
               whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(245, 166, 35, 0.35)' }}
               whileTap={{ scale: 0.96 }}
               style={{
@@ -361,7 +367,7 @@ const ServicesPage = () => {
               }}
             >
               Apply for Incubation ↗
-            </motion.a>
+            </MotionLink>
           </div>
         </Reveal>
       </div>

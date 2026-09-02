@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import locationData from "../data/locationData.json"; // Importing your JSON data
 
-// Updated Color Palette based on the new design
+// Updated Color Palette matching the provided button image and professional theme
 const C = {
-  primaryText: "#000000",
-  gradientStart: "#7B61FF",
-  gradientEnd: "#9D50FF",
-  buttonBg: "#635BFF",
-  border: "#E2E8F0",
+  primaryText: "#0D1F2D", // Dark slate for headings
+  gradientStart: "#1F486E", // Deep Navy from the button
+  gradientEnd: "#287BBE", // Lighter blue for gradient effect
+  buttonBg: "#1F486E", // Exact color from your uploaded image
+  border: "#CBD5E1",
   textLight: "#64748B",
   red: "#EF4444",
-  blueText: "#3B82F6",
-  bg: "#FFFFFF",
+  blueText: "#287BBE",
+  bg: "#F8FAFC", // Light modern background
+  white: "#FFFFFF",
 };
 
 const StartupRegistration = () => {
@@ -120,8 +121,8 @@ const StartupRegistration = () => {
     <div style={{ minHeight: "100vh", backgroundColor: C.bg, fontFamily: "sans-serif", padding: "40px" }}>
       
       {/* Breadcrumb */}
-      <div style={{ display: "flex", gap: "8px", fontSize: "14px", color: C.textLight, marginBottom: "60px" }}>
-        <span>🏠 Home</span> » <span style={{ color: C.buttonBg }}>Startup Registration</span>
+      <div style={{ display: "flex", gap: "8px", fontSize: "14px", color: C.textLight, marginBottom: "60px", fontWeight: 500 }}>
+        <span>🏠 Home</span> » <span style={{ color: C.buttonBg, fontWeight: 600 }}>Startup Registration</span>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", maxWidth: "1200px", margin: "0 auto", gap: "60px" }}>
@@ -133,15 +134,16 @@ const StartupRegistration = () => {
           </h2>
           <h1 style={{ 
             fontSize: "64px", 
-            fontWeight: 800, 
+            fontWeight: 900, 
             margin: "0 0 40px 0",
             background: `linear-gradient(90deg, ${C.gradientStart}, ${C.gradientEnd})`,
             WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent"
+            WebkitTextFillColor: "transparent",
+            lineHeight: 1.1
           }}>
             Let’s fill<br />the form!
           </h1>
-          <a href="mailto:connect@gincube.org" style={{ fontSize: "20px", color: C.primaryText, textDecoration: "underline" }}>
+          <a href="mailto:connect@gincube.org" style={{ fontSize: "18px", color: C.buttonBg, textDecoration: "none", fontWeight: 600, borderBottom: `2px solid ${C.buttonBg}` }}>
             connect@gincube.org
           </a>
         </div>
@@ -149,12 +151,12 @@ const StartupRegistration = () => {
         {/* Right Column: Form */}
         <motion.div 
           initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-          style={{ flex: "2 1 600px" }}
+          style={{ flex: "2 1 600px", background: C.white, padding: "40px", borderRadius: "16px", boxShadow: "0 10px 40px rgba(21, 67, 107, 0.05)" }}
         >
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             
             {/* Grid for 2-column fields */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
               <InputField label="Startup Name" name="startupName" required placeholder="Enter your startup name" value={formData.startupName} onChange={handleChange} />
               <InputField label="Email" name="email" type="email" required placeholder="Email ID" value={formData.email} onChange={handleChange} />
               
@@ -215,27 +217,40 @@ const StartupRegistration = () => {
             </div>
 
             {/* Security Code */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", marginTop: "20px" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600 }}>Security Code</span>
-              <div style={{ fontSize: "18px", letterSpacing: "2px", color: C.textLight }}>{captcha}</div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "10px", padding: "20px", background: C.bg, borderRadius: "8px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: C.textLight, textTransform: "uppercase", letterSpacing: "1px" }}>Security Code</span>
+              <div style={{ fontSize: "22px", letterSpacing: "6px", color: C.primaryText, fontWeight: 800, fontFamily: "monospace" }}>{captcha}</div>
               <input 
-                type="text" name="securityCode" value={formData.securityCode} onChange={handleChange} required
-                style={{ ...inputBaseStyles, width: "150px", textAlign: "center", borderColor: C.primaryText }}
+                type="text" name="securityCode" value={formData.securityCode} onChange={handleChange} required placeholder="Enter code"
+                style={{ ...inputBaseStyles, width: "160px", textAlign: "center", borderColor: C.border, fontWeight: 600, letterSpacing: "2px" }}
               />
             </div>
 
             {/* Submit Button */}
             <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
               <motion.button
-                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02, boxShadow: "0 8px 20px rgba(31, 72, 110, 0.25)" }} 
+                whileTap={{ scale: 0.98 }}
                 disabled={loading}
                 style={{
-                  background: C.buttonBg, color: "#fff", border: "none", padding: "12px 32px",
-                  borderRadius: "6px", fontSize: "16px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
-                  width: "200px"
+                  background: C.buttonBg, 
+                  color: "#fff", 
+                  border: "none", 
+                  padding: "16px 40px",
+                  borderRadius: "8px", 
+                  fontSize: "16px", 
+                  fontWeight: 600, 
+                  cursor: loading ? "not-allowed" : "pointer",
+                  width: "100%", 
+                  maxWidth: "280px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                  transition: "box-shadow 0.2s"
                 }}
               >
-                {loading ? "Submitting..." : "Register Now"}
+                {loading ? "Submitting..." : <>Register Now <span>→</span></>}
               </motion.button>
             </div>
 
@@ -251,22 +266,41 @@ export default StartupRegistration;
 /* --- REUSABLE COMPONENTS & STYLES --- */
 
 const inputBaseStyles = {
-  width: "100%", padding: "12px 16px", borderRadius: "6px", border: `1px solid ${C.border}`,
-  fontSize: "14px", outline: "none", transition: "border 0.2s", boxSizing: "border-box", backgroundColor: "#fff"
+  width: "100%", 
+  padding: "14px 16px", 
+  borderRadius: "8px", 
+  border: `1.5px solid ${C.border}`,
+  fontSize: "14px", 
+  outline: "none", 
+  transition: "border 0.2s, box-shadow 0.2s", 
+  boxSizing: "border-box", 
+  backgroundColor: C.white,
+  color: C.primaryText,
+  fontWeight: 500
 };
 
 const Label = ({ text, required, optional }) => (
-  <label style={{ fontSize: "13px", fontWeight: 600, color: C.primaryText }}>
+  <label style={{ fontSize: "14px", fontWeight: 700, color: C.primaryText }}>
     {text} 
     {required && <span style={{ color: C.red }}> *</span>}
-    {optional && <span style={{ color: C.blueText, fontWeight: 400 }}> (Optional)</span>}
+    {optional && <span style={{ color: C.textLight, fontWeight: 500, fontSize: "12px" }}> (Optional)</span>}
   </label>
 );
 
 const InputField = ({ label, required, optional, disabled, ...props }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
     <Label text={label} required={required} optional={optional} />
-    <input style={{ ...inputBaseStyles, opacity: disabled ? 0.6 : 1, cursor: disabled ? "not-allowed" : "text" }} disabled={disabled} {...props} />
+    <input 
+      style={{ 
+        ...inputBaseStyles, 
+        opacity: disabled ? 0.6 : 1, 
+        cursor: disabled ? "not-allowed" : "text" 
+      }} 
+      disabled={disabled} 
+      {...props} 
+      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
+      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
+    />
   </div>
 );
 
@@ -274,9 +308,16 @@ const SelectField = ({ label, required, optional, options, placeholder, disabled
   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
     <Label text={label} required={required} optional={optional} />
     <select 
-      style={{ ...inputBaseStyles, color: props.value ? "#000" : C.textLight, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.6 : 1 }} 
+      style={{ 
+        ...inputBaseStyles, 
+        color: props.value ? C.primaryText : C.textLight, 
+        cursor: disabled ? "not-allowed" : "pointer", 
+        opacity: disabled ? 0.6 : 1 
+      }} 
       disabled={disabled} 
       {...props}
+      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
+      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
     >
       <option value="" disabled>{placeholder}</option>
       {options && options.map((opt, i) => (

@@ -41,18 +41,18 @@ const indiaData = {
   "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
 };
 
-// Styling Variables
+// Updated Styling Variables (Navy Blue Professional Theme)
 const C = {
-  primaryText: "#000000",
-  gradientStart: "#7B61FF",
-  gradientEnd: "#9D50FF",
-  // Button Color updated as per image_089ece.png
-  buttonBg: "#1C456C", 
-  border: "#E2E8F0",
+  primaryText: "#0D1F2D", 
+  gradientStart: "#1F486E", // Deep Navy 
+  gradientEnd: "#287BBE", // Lighter blue
+  buttonBg: "#1F486E", // Updated based on button image
+  border: "#CBD5E1",
   textLight: "#64748B",
   red: "#EF4444",
-  blueText: "#3B82F6",
-  bg: "#FFFFFF",
+  blueText: "#287BBE",
+  bg: "#F8FAFC", // Professional light background
+  white: "#FFFFFF",
 };
 
 const MentorRegistration = () => {
@@ -175,8 +175,8 @@ const MentorRegistration = () => {
     <div style={{ minHeight: "100vh", backgroundColor: C.bg, fontFamily: "sans-serif", padding: "40px" }}>
       
       {/* Breadcrumb */}
-      <div style={{ display: "flex", gap: "8px", fontSize: "14px", color: C.textLight, marginBottom: "60px" }}>
-        <span>🏠 Home</span> » <span style={{ color: "#635BFF" }}>Mentor Registration</span>
+      <div style={{ display: "flex", gap: "8px", fontSize: "14px", color: C.textLight, marginBottom: "60px", fontWeight: 500 }}>
+        <span>🏠 Home</span> » <span style={{ color: C.buttonBg, fontWeight: 600 }}>Mentor Registration</span>
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", maxWidth: "1200px", margin: "0 auto", gap: "60px" }}>
@@ -188,15 +188,16 @@ const MentorRegistration = () => {
           </h2>
           <h1 style={{ 
             fontSize: "64px", 
-            fontWeight: 800, 
+            fontWeight: 900, 
             margin: "0 0 40px 0",
             background: `linear-gradient(90deg, ${C.gradientStart}, ${C.gradientEnd})`,
             WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent"
+            WebkitTextFillColor: "transparent",
+            lineHeight: 1.1
           }}>
             Let’s fill<br />the form!
           </h1>
-          <a href="mailto:connect@gincube.org" style={{ fontSize: "20px", color: C.primaryText, textDecoration: "underline" }}>
+          <a href="mailto:connect@gincube.org" style={{ fontSize: "18px", color: C.buttonBg, textDecoration: "none", fontWeight: 600, borderBottom: `2px solid ${C.buttonBg}` }}>
             connect@gincube.org
           </a>
         </div>
@@ -204,9 +205,9 @@ const MentorRegistration = () => {
         {/* Right Column (Form) */}
         <motion.div 
           initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-          style={{ flex: "2 1 600px", maxWidth: "700px" }}
+          style={{ flex: "2 1 600px", maxWidth: "700px", background: C.white, padding: "40px", borderRadius: "16px", boxShadow: "0 10px 40px rgba(21, 67, 107, 0.05)" }}
         >
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             
             <InputField label="Full Name" name="fullName" required placeholder="Enter Name" value={formData.fullName} onChange={handleChange} />
             <InputField label="Email" name="email" type="email" required placeholder="Enter Email" value={formData.email} onChange={handleChange} />
@@ -232,13 +233,19 @@ const MentorRegistration = () => {
 
             <SelectField label="Number of years in Mentorship" name="yearsInMentorship" optional placeholder="Select One" value={formData.yearsInMentorship} onChange={handleChange} options={["1-3 Years", "3-5 Years", "5-10 Years", "10+ Years"]} />
 
-            {/* Checkboxes */}
+            {/* Checkboxes for Sector Expertise */}
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "10px" }}>
               <Label text="Sector Expertise:" optional />
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginTop: "8px" }}>
                 {sectorOptions.map((sector, index) => (
-                  <label key={index} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", color: C.textLight, cursor: "pointer" }}>
-                    <input type="checkbox" value={sector} checked={formData.sectors.includes(sector)} onChange={handleSectorChange} style={{ width: "16px", height: "16px", cursor: "pointer" }} />
+                  <label key={index} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
+                    <input 
+                      type="checkbox" 
+                      value={sector} 
+                      checked={formData.sectors.includes(sector)} 
+                      onChange={handleSectorChange} 
+                      style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: C.buttonBg }} 
+                    />
                     {sector}
                   </label>
                 ))}
@@ -246,45 +253,62 @@ const MentorRegistration = () => {
             </div>
 
             {/* Security Code */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", marginTop: "30px" }}>
-              <span style={{ fontSize: "14px", fontWeight: 600 }}>Security Code</span>
-              <div style={{ fontSize: "18px", letterSpacing: "2px", color: C.textLight, background: "#f8fafc", padding: "4px 12px", borderRadius: "4px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "10px", padding: "20px", background: C.bg, borderRadius: "8px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: C.textLight, textTransform: "uppercase", letterSpacing: "1px" }}>Security Code</span>
+              <div style={{ fontSize: "22px", letterSpacing: "6px", color: C.primaryText, fontWeight: 800, fontFamily: "monospace" }}>
                 {captcha}
               </div>
-              <input type="text" name="securityCode" value={formData.securityCode} onChange={handleChange} required style={{ ...inputBaseStyles, width: "180px", textAlign: "center", borderColor: C.primaryText }} />
+              <input 
+                type="text" 
+                name="securityCode" 
+                value={formData.securityCode} 
+                onChange={handleChange} 
+                required 
+                placeholder="Enter code"
+                style={{ ...inputBaseStyles, width: "160px", textAlign: "center", borderColor: C.border, fontWeight: 600, letterSpacing: "2px" }} 
+              />
             </div>
 
             <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: C.textLight, cursor: "pointer" }}>
-                <input type="checkbox" name="isCertified" required checked={formData.isCertified} onChange={handleChange} style={{ width: "16px", height: "16px", cursor: "pointer" }} />
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
+                <input 
+                  type="checkbox" 
+                  name="isCertified" 
+                  required 
+                  checked={formData.isCertified} 
+                  onChange={handleChange} 
+                  style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: C.buttonBg }} 
+                />
                 I hereby certify that the above given information is true and accurate<span style={{ color: C.red }}>*</span>
               </label>
             </div>
 
-            {/* UPDATED BUTTON MATCHING IMAGE */}
+            {/* UPDATED SUBMIT BUTTON (Smaller Size) */}
             <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
               <motion.button
-                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.02, boxShadow: "0 8px 20px rgba(31, 72, 110, 0.25)" }} 
+                whileTap={{ scale: 0.98 }}
                 disabled={loading}
                 style={{
-                  background: C.buttonBg, // Dark Blue #1C456C
+                  background: C.buttonBg, // Dark Navy Blue
                   color: "#ffffff", 
                   border: "none", 
-                  padding: "16px 40px",
-                  borderRadius: "12px", // Smooth rounded corners
-                  fontSize: "16px", 
-                  fontWeight: 700, 
+                  padding: "12px 32px", // Smaller padding for a smaller button
+                  borderRadius: "8px", // Standard radius
+                  fontSize: "15px", // Slightly smaller font
+                  fontWeight: 600, 
                   cursor: loading ? "not-allowed" : "pointer",
                   width: "100%",
-                  maxWidth: "500px", // Makes it long and horizontal like the image
+                  maxWidth: "220px", // Reduced max width to make it compact
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "10px",
-                  boxShadow: "0 4px 14px rgba(28, 69, 108, 0.2)" // subtle shadow
+                  gap: "8px",
+                  boxShadow: "0 4px 14px rgba(28, 69, 108, 0.2)",
+                  transition: "box-shadow 0.2s"
                 }}
               >
-                {loading ? "Submitting..." : "Register Now →"}
+                {loading ? "Submitting..." : <>Register Investor <span>→</span></>}
               </motion.button>
             </div>
 
@@ -300,22 +324,41 @@ export default MentorRegistration;
 /* --- REUSABLE COMPONENTS & STYLES --- */
 
 const inputBaseStyles = {
-  width: "100%", padding: "12px 16px", borderRadius: "6px", border: `1px solid ${C.border}`,
-  fontSize: "14px", outline: "none", transition: "border 0.2s", boxSizing: "border-box", backgroundColor: "#fff"
+  width: "100%", 
+  padding: "14px 16px", 
+  borderRadius: "8px", 
+  border: `1.5px solid ${C.border}`,
+  fontSize: "14px", 
+  outline: "none", 
+  transition: "border 0.2s, box-shadow 0.2s", 
+  boxSizing: "border-box", 
+  backgroundColor: C.white,
+  color: C.primaryText,
+  fontWeight: 500
 };
 
 const Label = ({ text, required, optional }) => (
-  <label style={{ fontSize: "14px", fontWeight: 600, color: C.primaryText }}>
+  <label style={{ fontSize: "14px", fontWeight: 700, color: C.primaryText }}>
     {text} 
     {required && <span style={{ color: C.red }}> *</span>}
-    {optional && <span style={{ color: C.blueText, fontWeight: 400 }}> (Optional)</span>}
+    {optional && <span style={{ color: C.textLight, fontWeight: 500, fontSize: "12px" }}> (Optional)</span>}
   </label>
 );
 
-const InputField = ({ label, required, optional, ...props }) => (
+const InputField = ({ label, required, optional, disabled, ...props }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
     <Label text={label} required={required} optional={optional} />
-    <input style={inputBaseStyles} {...props} />
+    <input 
+      style={{ 
+        ...inputBaseStyles, 
+        opacity: disabled ? 0.6 : 1, 
+        cursor: disabled ? "not-allowed" : "text" 
+      }} 
+      disabled={disabled} 
+      {...props} 
+      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
+      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
+    />
   </div>
 );
 
@@ -323,12 +366,19 @@ const SelectField = ({ label, required, optional, options, placeholder, disabled
   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
     <Label text={label} required={required} optional={optional} />
     <select 
-      style={{ ...inputBaseStyles, color: props.value ? "#000" : C.textLight, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.6 : 1 }} 
+      style={{ 
+        ...inputBaseStyles, 
+        color: props.value ? C.primaryText : C.textLight, 
+        cursor: disabled ? "not-allowed" : "pointer", 
+        opacity: disabled ? 0.6 : 1 
+      }} 
       disabled={disabled} 
       {...props}
+      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
+      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
     >
       {placeholder && <option value="" disabled>{placeholder}</option>}
-      {options.map((opt, i) => (
+      {options && options.map((opt, i) => (
         <option key={i} value={opt}>{opt}</option>
       ))}
     </select>

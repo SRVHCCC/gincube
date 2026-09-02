@@ -1,5 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
+// ADDED: Import Link from react-router-dom
+import { Link } from 'react-router-dom';
+
+// Create a motion-enabled Link component
+const MotionLink = motion(Link);
 
 /* ─────────────────────────────────────────
    BRAND TOKENS (Modernized Navy Blue & Golden Orange)
@@ -459,10 +464,14 @@ const ContactPage = () => (
             G.Incube is Gwalior's premier startup incubation center. Whether you have an idea, a question, or a vision — we're here for you.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'center', position: 'relative', zIndex: 2 }}>
-            <motion.a href="https://gincube.org/startup-registration" target="_blank" rel="noopener noreferrer" whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(245, 166, 35, 0.35)' }} whileTap={{ scale: 0.96 }}
+            {/* UPDATED BUTTON to use React Router Link */}
+            <MotionLink 
+              to="/startup-registration" 
+              whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(245, 166, 35, 0.35)' }} 
+              whileTap={{ scale: 0.96 }}
               style={{ display: 'inline-flex', alignItems: 'center', background: C.accent, color: C.dark, textDecoration: 'none', fontWeight: 800, fontSize: 16, padding: '16px 36px', borderRadius: 100, boxShadow: '0 8px 24px rgba(245, 166, 35, 0.25)', transition: 'background 0.3s' }}>
               Apply for Incubation ↗
-            </motion.a>
+            </MotionLink>
             <motion.a href="mailto:connect@gincube.org" whileHover={{ y: -4, background: 'rgba(255,255,255,0.1)' }} whileTap={{ scale: 0.96 }}
               style={{ display: 'inline-flex', alignItems: 'center', background: 'transparent', border: `2px solid rgba(245, 166, 35, 0.5)`, color: C.white, textDecoration: 'none', fontWeight: 800, fontSize: 16, padding: '14px 36px', borderRadius: 100, transition: 'all 0.3s' }}>
               Email Us

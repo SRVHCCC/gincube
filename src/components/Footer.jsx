@@ -25,12 +25,15 @@ const C = {
 };
 
 /* ═══════════════════════════════════════════════════
-   SHIMMER BUTTON (Reused for consistent CTA)
+   SHIMMER BUTTON (Updated to use React Router Link)
 ═══════════════════════════════════════════════════ */
-const ShimmerBtn = ({ children, href, style = {} }) => {
+const ShimmerBtn = ({ children, to, style = {} }) => {
+  // Using motion(Link) for internal routing with Framer Motion animations
+  const MotionLink = motion(Link);
+
   return (
-    <motion.a
-      href={href}
+    <MotionLink
+      to={to}
       whileHover={{ y: -3, scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
       style={{
@@ -70,7 +73,7 @@ const ShimmerBtn = ({ children, href, style = {} }) => {
         }}
       />
       <span style={{ position: "relative", zIndex: 1 }}>{children}</span>
-    </motion.a>
+    </MotionLink>
   );
 };
 
@@ -125,35 +128,40 @@ const itemAnim = {
 /* ═══════════════════════════════════════════════════
    SUB-COMPONENTS
 ═══════════════════════════════════════════════════ */
-const FooterLink = ({ href, children }) => (
-  <motion.div variants={itemAnim}>
-    <motion.a
-      href={href}
-      initial="rest"
-      whileHover="hover"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        color: C.text,
-        textDecoration: "none",
-        fontSize: 15,
-        fontWeight: 500,
-        padding: "6px 0",
-        cursor: "pointer",
-      }}
-    >
-      <motion.span
-        variants={{
-          rest: { x: 0, color: C.text },
-          hover: { x: 6, color: C.accent }, // Pops with Orange on hover
+
+// Updated to use React Router Link
+const FooterLink = ({ to, children }) => {
+  const MotionLink = motion(Link);
+  return (
+    <motion.div variants={itemAnim}>
+      <MotionLink
+        to={to}
+        initial="rest"
+        whileHover="hover"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          color: C.text,
+          textDecoration: "none",
+          fontSize: 15,
+          fontWeight: 500,
+          padding: "6px 0",
+          cursor: "pointer",
         }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
       >
-        {children}
-      </motion.span>
-    </motion.a>
-  </motion.div>
-);
+        <motion.span
+          variants={{
+            rest: { x: 0, color: C.text },
+            hover: { x: 6, color: C.accent }, // Pops with Orange on hover
+          }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        >
+          {children}
+        </motion.span>
+      </MotionLink>
+    </motion.div>
+  );
+};
 
 const SocialIcon = ({ href, path }) => {
   const [isHovered, setHovered] = useState(false);
@@ -306,7 +314,8 @@ const Footer = () => {
               </motion.p>
             </div>
             <motion.div variants={itemAnim}>
-              <ShimmerBtn href="https://gincube.org/startup-registration">
+              {/* UPDATED: Changed href to 'to' for internal routing */}
+              <ShimmerBtn to="/startup-registration">
                 Apply for Incubation →
               </ShimmerBtn>
             </motion.div>
@@ -392,11 +401,12 @@ const Footer = () => {
                 Quick Links
               </motion.h4>
               <div style={{ display: "flex", flexDirection: "column" }}>
-                <FooterLink href="/">Home</FooterLink>
-                <FooterLink href="/who-we-are">Who We Are</FooterLink>
-                <FooterLink href="/events">Events & Hackathons</FooterLink>
-                <FooterLink href="/GWEDC">GWEDC (Women Cell)</FooterLink>
-                <FooterLink href="/contact-us">Contact Us</FooterLink>
+                {/* UPDATED: Changed href to 'to' for internal routing */}
+                <FooterLink to="/">Home</FooterLink>
+                <FooterLink to="/who-we-are">Who We Are</FooterLink>
+                <FooterLink to="/events">Events & Hackathons</FooterLink>
+                <FooterLink to="/GWEDC">GWEDC (Women Cell)</FooterLink>
+                <FooterLink to="/contact-us">Contact Us</FooterLink>
               </div>
             </div>
 
@@ -414,13 +424,14 @@ const Footer = () => {
                 Registrations
               </motion.h4>
               <div style={{ display: "flex", flexDirection: "column" }}>
-                <FooterLink href="/startup-registration">
+                {/* UPDATED: Changed href to 'to' for internal routing */}
+                <FooterLink to="/startup-registration">
                   Startup Registration
                 </FooterLink>
-                <FooterLink href="/partner-registration">
+                <FooterLink to="/partner-registration">
                   Partner Registration
                 </FooterLink>
-                <FooterLink href="/hackathon-registration">
+                <FooterLink to="/hackathon-registration">
                   Hackathon Registration
                 </FooterLink>
               </div>
@@ -527,7 +538,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  color: C.primary, // या "#007bff"
+                  color: C.primary, 
                   textDecoration: "none",
                   fontWeight: 600,
                 }}

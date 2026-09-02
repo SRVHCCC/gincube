@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useAnimation, animate } from 'framer-motion';
+// ADDED: Import Link from react-router-dom
+import { Link } from 'react-router-dom';
 
 // ─── IMAGES IMPORT ───
 import logoImage from '../assets/logo.png';
@@ -255,176 +257,179 @@ const SectionCard = ({ s, index }) => {
 /* ─────────────────────────────────────────
    MAIN PAGE COMPONENT
 ───────────────────────────────────────── */
-const WhoWeAre = () => (
-  <section style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif", color: C.heading, overflowX: 'hidden' }}>
+const WhoWeAre = () => {
+  // Setup framer-motion wrapped Link component
+  const MotionLink = motion(Link);
 
-    {/* ── HERO ── */}
-    <div style={{
-      position: 'relative',
-      background: `linear-gradient(135deg, ${C.dark} 0%, ${C.darkMid} 100%)`,
-      padding: 'clamp(80px, 12vw, 120px) 24px clamp(120px, 15vw, 160px)',
-      overflow: 'hidden', textAlign: 'center'
-    }}>
-      {/* Ambient Orbs */}
-      <Orb
-        style={{ top: -100, left: '10%', width: 500, height: 500, background: 'radial-gradient(circle, rgba(40, 123, 190, 0.25) 0%, transparent 70%)' }}
-        animate={{ y: [0, 30, 0] }} transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <Orb
-        style={{ bottom: -150, right: '5%', width: 600, height: 600, background: 'radial-gradient(circle, rgba(245, 166, 35, 0.15) 0%, transparent 70%)' }}
-        animate={{ y: [0, -40, 0] }} transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-      />
+  return (
+    <section style={{ fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif", color: C.heading, overflowX: 'hidden' }}>
 
-      {/* Eyebrow */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 20, position: 'relative', zIndex: 2 }}
-      >
-        <div style={{ height: 2, width: 40, background: `linear-gradient(90deg,transparent,${C.accent})` }} />
-        <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: C.accent }}>About Us</span>
-        <div style={{ height: 2, width: 40, background: `linear-gradient(90deg,${C.accent},transparent)` }} />
-      </motion.div>
-
-      {/* Heading */}
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        style={{ margin: '0 auto 16px', fontSize: 'clamp(40px, 8vw, 72px)', fontWeight: 900, color: C.white, letterSpacing: '-1.5px', lineHeight: 1.1, position: 'relative', zIndex: 2 }}
-      >
-        Who We Are
-      </motion.h1>
-
-      {/* Subtitle */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        style={{ margin: '0 auto 40px', maxWidth: 600, fontSize: 'clamp(16px, 3vw, 20px)', color: '#CBD5E1', lineHeight: 1.6, position: 'relative', zIndex: 2 }}
-      >
-        Gwalior Smart City Incubation Center - where ideas become impactful ventures.
-      </motion.p>
-
-      {/* FIXED BADGE */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.6 }}
-        style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 2 }}
-      >
-        <motion.div
-          animate={{ y: [0, -6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            background: 'rgba(255, 255, 255, 0.92)', border: `1px solid rgba(245, 166, 35, 0.4)`, borderRadius: 20,
-            padding: '16px 28px', display: 'inline-flex', alignItems: 'center', gap: 16,
-            backdropFilter: 'blur(16px)', boxShadow: `0 12px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(245, 166, 35, 0.1)`,
-          }}
-        >
-          <div style={{ background: C.white, borderRadius: 12, padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(27, 70, 113, 0.08)' }}>
-            {/* UPDATED: Using imported logoImage */}
-            <img src={logoImage} alt="Gwalior Smart City" style={{ height: 48, width: 'auto', display: 'block' }}
-              onError={e => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<span style="font-size:24px;font-weight:900;color:#1B4671;">G</span>`; }} />
-          </div>
-          <div style={{ width: 1, height: 48, background: `linear-gradient(180deg, transparent, ${C.pale}, transparent)` }} />
-          <div style={{ textAlign: 'left' }}>
-            <p style={{ margin: '0 0 4px', fontSize: 11, color: C.accent, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Under</p>
-            <p style={{ margin: 0, fontSize: 14, color: C.heading, fontWeight: 800, lineHeight: 1.4 }}>
-              Gwalior Smart City<br />
-              <span style={{ color: C.primary, fontWeight: 700 }}>Development Corporation</span>
-            </p>
-          </div>
-          <motion.div
-            animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ width: 10, height: 10, borderRadius: '50%', background: C.accent, flexShrink: 0, boxShadow: `0 0 0 4px rgba(245, 166, 35, 0.2)` }}
-          />
-        </motion.div>
-      </motion.div>
-    </div>
-
-    {/* ── MAIN OVERLAPPING CONTENT CONTAINER ── */}
-    <div style={{ background: C.bg, padding: '0 clamp(20px, 5vw, 32px) clamp(80px, 12vw, 120px)' }}>
-      
-      {/* ── IMAGES GRID ── */}
+      {/* ── HERO ── */}
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24,
-        maxWidth: 1200, margin: '0 auto', marginTop: '-60px', position: 'relative', zIndex: 3
+        position: 'relative',
+        background: `linear-gradient(135deg, ${C.dark} 0%, ${C.darkMid} 100%)`,
+        padding: 'clamp(80px, 12vw, 120px) 24px clamp(120px, 15vw, 160px)',
+        overflow: 'hidden', textAlign: 'center'
       }}>
-        <Reveal delay={0.05} style={{ borderRadius: 24, overflow: 'hidden', height: 'clamp(240px, 30vw, 340px)', boxShadow: '0 20px 40px rgba(11, 30, 54, 0.1)' }}>
-          {/* UPDATED: Using imported office1Image */}
-          <motion.img src={office1Image} alt="G.Incube facility" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            onError={e => { e.target.parentElement.style.background = `linear-gradient(135deg,${C.lt},${C.pale})`; e.target.style.display = 'none'; }} />
-        </Reveal>
-        <Reveal delay={0.15} style={{ borderRadius: 24, overflow: 'hidden', height: 'clamp(240px, 30vw, 340px)', boxShadow: '0 20px 40px rgba(11, 30, 54, 0.1)' }}>
-          {/* UPDATED: Using imported office2Image */}
-          <motion.img src={office2Image} alt="G.Incube team" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            onError={e => { e.target.parentElement.style.background = `linear-gradient(135deg,${C.pale},${C.lt})`; e.target.style.display = 'none'; }} />
-        </Reveal>
-      </div>
+        {/* Ambient Orbs */}
+        <Orb
+          style={{ top: -100, left: '10%', width: 500, height: 500, background: 'radial-gradient(circle, rgba(40, 123, 190, 0.25) 0%, transparent 70%)' }}
+          animate={{ y: [0, 30, 0] }} transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <Orb
+          style={{ bottom: -150, right: '5%', width: 600, height: 600, background: 'radial-gradient(circle, rgba(245, 166, 35, 0.15) 0%, transparent 70%)' }}
+          animate={{ y: [0, -40, 0] }} transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-      {/* ── TEXT SECTIONS CARDS (NOW ANIMATED) ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32, maxWidth: 1200, margin: '64px auto' }}>
-        {sections.map((s, i) => (
-          <SectionCard key={i} s={s} index={i} />
-        ))}
-      </div>
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 20, position: 'relative', zIndex: 2 }}
+        >
+          <div style={{ height: 2, width: 40, background: `linear-gradient(90deg,transparent,${C.accent})` }} />
+          <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: C.accent }}>About Us</span>
+          <div style={{ height: 2, width: 40, background: `linear-gradient(90deg,${C.accent},transparent)` }} />
+        </motion.div>
 
-      {/* ── STATS ROW ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, maxWidth: 1200, margin: '0 auto 64px' }}>
-        {stats.map((s, i) => (
-          <StatCard key={i} num={s.value} label={s.label} delay={i * 0.1} />
-        ))}
-      </div>
+        {/* Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          style={{ margin: '0 auto 16px', fontSize: 'clamp(40px, 8vw, 72px)', fontWeight: 900, color: C.white, letterSpacing: '-1.5px', lineHeight: 1.1, position: 'relative', zIndex: 2 }}
+        >
+          Who We Are
+        </motion.h1>
 
-      {/* ── TAGS ── */}
-      <Reveal delay={0.2} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12, maxWidth: 1000, margin: '0 auto 80px' }}>
-        {tags.map((tag, i) => (
-          <motion.span
-            key={i} whileHover={{ y: -3, scale: 1.05 }} transition={{ duration: 0.2 }}
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          style={{ margin: '0 auto 40px', maxWidth: 600, fontSize: 'clamp(16px, 3vw, 20px)', color: '#CBD5E1', lineHeight: 1.6, position: 'relative', zIndex: 2 }}
+        >
+          Gwalior Smart City Incubation Center - where ideas become impactful ventures.
+        </motion.p>
+
+        {/* FIXED BADGE */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.6 }}
+          style={{ display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 2 }}
+        >
+          <motion.div
+            animate={{ y: [0, -6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             style={{
-              background: C.white, border: `1px solid ${C.lt}`, color: C.primary,
-              padding: '10px 20px', borderRadius: 100, fontSize: 14, fontWeight: 700, 
-              boxShadow: '0 4px 12px rgba(11, 30, 54, 0.03)', cursor: 'default',
+              background: 'rgba(255, 255, 255, 0.92)', border: `1px solid rgba(245, 166, 35, 0.4)`, borderRadius: 20,
+              padding: '16px 28px', display: 'inline-flex', alignItems: 'center', gap: 16,
+              backdropFilter: 'blur(16px)', boxShadow: `0 12px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(245, 166, 35, 0.1)`,
             }}
           >
-            {tag}
-          </motion.span>
-        ))}
-      </Reveal>
+            <div style={{ background: C.white, borderRadius: 12, padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(27, 70, 113, 0.08)' }}>
+              <img src={logoImage} alt="Gwalior Smart City" style={{ height: 48, width: 'auto', display: 'block' }}
+                onError={e => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<span style="font-size:24px;font-weight:900;color:#1B4671;">G</span>`; }} />
+            </div>
+            <div style={{ width: 1, height: 48, background: `linear-gradient(180deg, transparent, ${C.pale}, transparent)` }} />
+            <div style={{ textAlign: 'left' }}>
+              <p style={{ margin: '0 0 4px', fontSize: 11, color: C.accent, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Under</p>
+              <p style={{ margin: 0, fontSize: 14, color: C.heading, fontWeight: 800, lineHeight: 1.4 }}>
+                Gwalior Smart City<br />
+                <span style={{ color: C.primary, fontWeight: 700 }}>Development Corporation</span>
+              </p>
+            </div>
+            <motion.div
+              animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ width: 10, height: 10, borderRadius: '50%', background: C.accent, flexShrink: 0, boxShadow: `0 0 0 4px rgba(245, 166, 35, 0.2)` }}
+            />
+          </motion.div>
+        </motion.div>
+      </div>
 
-      {/* ── BOTTOM CTA CARD ── */}
-      <Reveal delay={0.3} style={{ maxWidth: 1200, margin: '0 auto' }}>
+      {/* ── MAIN OVERLAPPING CONTENT CONTAINER ── */}
+      <div style={{ background: C.bg, padding: '0 clamp(20px, 5vw, 32px) clamp(80px, 12vw, 120px)' }}>
+        
+        {/* ── IMAGES GRID ── */}
         <div style={{
-          background: `linear-gradient(90deg, ${C.dark} 0%, ${C.darkMid} 50%, ${C.dark} 100%)`,
-          borderRadius: 32, padding: 'clamp(56px, 8vw, 80px) clamp(24px, 6vw, 64px)', textAlign: 'center',
-          position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(11, 30, 54, 0.15)'
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24,
+          maxWidth: 1200, margin: '0 auto', marginTop: '-60px', position: 'relative', zIndex: 3
         }}>
-          {/* Subtle glow effect */}
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%',
-            background: 'radial-gradient(circle, rgba(245, 166, 35, 0.1), transparent 60%)', pointerEvents: 'none', filter: 'blur(40px)' }} />
-          
-          <h2 style={{ margin: '0 0 20px', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, color: '#fff', lineHeight: 1.1, position: 'relative', zIndex: 2 }}>
-            Ready to build the next<br/>
-            <span style={{ color: C.accent }}>big thing?</span>
-          </h2>
-          
-          <p style={{ margin: '0 auto 40px', fontSize: 18, color: '#CBD5E1', lineHeight: 1.6, maxWidth: 640, position: 'relative', zIndex: 2 }}>
-            Join Gincube today and get the resources, mentorship, and funding you need to accelerate your startup journey.
-          </p>
-          
-          <motion.a
-            href="#startup"
-            whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(245, 166, 35, 0.35)' }}
-            whileTap={{ scale: 0.96 }}
-            style={{
-              position: 'relative', zIndex: 2, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              background: C.accent, color: C.dark, textDecoration: 'none', fontWeight: 800,
-              fontSize: 16, padding: '16px 40px', borderRadius: 100,
-              boxShadow: '0 8px 24px rgba(245, 166, 35, 0.25)', transition: 'background 0.3s ease'
-            }}
-          >
-            Start Your Journey Now
-          </motion.a>
+          <Reveal delay={0.05} style={{ borderRadius: 24, overflow: 'hidden', height: 'clamp(240px, 30vw, 340px)', boxShadow: '0 20px 40px rgba(11, 30, 54, 0.1)' }}>
+            <motion.img src={office1Image} alt="G.Incube facility" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              onError={e => { e.target.parentElement.style.background = `linear-gradient(135deg,${C.lt},${C.pale})`; e.target.style.display = 'none'; }} />
+          </Reveal>
+          <Reveal delay={0.15} style={{ borderRadius: 24, overflow: 'hidden', height: 'clamp(240px, 30vw, 340px)', boxShadow: '0 20px 40px rgba(11, 30, 54, 0.1)' }}>
+            <motion.img src={office2Image} alt="G.Incube team" whileHover={{ scale: 1.05 }} transition={{ duration: 0.6 }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              onError={e => { e.target.parentElement.style.background = `linear-gradient(135deg,${C.pale},${C.lt})`; e.target.style.display = 'none'; }} />
+          </Reveal>
         </div>
-      </Reveal>
 
-    </div>
-  </section>
-);
+        {/* ── TEXT SECTIONS CARDS (NOW ANIMATED) ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32, maxWidth: 1200, margin: '64px auto' }}>
+          {sections.map((s, i) => (
+            <SectionCard key={i} s={s} index={i} />
+          ))}
+        </div>
+
+        {/* ── STATS ROW ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, maxWidth: 1200, margin: '0 auto 64px' }}>
+          {stats.map((s, i) => (
+            <StatCard key={i} num={s.value} label={s.label} delay={i * 0.1} />
+          ))}
+        </div>
+
+        {/* ── TAGS ── */}
+        <Reveal delay={0.2} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12, maxWidth: 1000, margin: '0 auto 80px' }}>
+          {tags.map((tag, i) => (
+            <motion.span
+              key={i} whileHover={{ y: -3, scale: 1.05 }} transition={{ duration: 0.2 }}
+              style={{
+                background: C.white, border: `1px solid ${C.lt}`, color: C.primary,
+                padding: '10px 20px', borderRadius: 100, fontSize: 14, fontWeight: 700, 
+                boxShadow: '0 4px 12px rgba(11, 30, 54, 0.03)', cursor: 'default',
+              }}
+            >
+              {tag}
+            </motion.span>
+          ))}
+        </Reveal>
+
+        {/* ── BOTTOM CTA CARD ── */}
+        <Reveal delay={0.3} style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{
+            background: `linear-gradient(90deg, ${C.dark} 0%, ${C.darkMid} 50%, ${C.dark} 100%)`,
+            borderRadius: 32, padding: 'clamp(56px, 8vw, 80px) clamp(24px, 6vw, 64px)', textAlign: 'center',
+            position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(11, 30, 54, 0.15)'
+          }}>
+            {/* Subtle glow effect */}
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80%', height: '80%',
+              background: 'radial-gradient(circle, rgba(245, 166, 35, 0.1), transparent 60%)', pointerEvents: 'none', filter: 'blur(40px)' }} />
+            
+            <h2 style={{ margin: '0 0 20px', fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, color: '#fff', lineHeight: 1.1, position: 'relative', zIndex: 2 }}>
+              Ready to build the next<br/>
+              <span style={{ color: C.accent }}>big thing?</span>
+            </h2>
+            
+            <p style={{ margin: '0 auto 40px', fontSize: 18, color: '#CBD5E1', lineHeight: 1.6, maxWidth: 640, position: 'relative', zIndex: 2 }}>
+              Join Gincube today and get the resources, mentorship, and funding you need to accelerate your startup journey.
+            </p>
+            
+            {/* UPDATED TO USE REACT ROUTER LINK */}
+            <MotionLink
+              to="/startup-registration"
+              whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(245, 166, 35, 0.35)' }}
+              whileTap={{ scale: 0.96 }}
+              style={{
+                position: 'relative', zIndex: 2, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: C.accent, color: C.dark, textDecoration: 'none', fontWeight: 800,
+                fontSize: 16, padding: '16px 40px', borderRadius: 100,
+                boxShadow: '0 8px 24px rgba(245, 166, 35, 0.25)', transition: 'background 0.3s ease'
+              }}
+            >
+              Start Your Journey Now
+            </MotionLink>
+          </div>
+        </Reveal>
+
+      </div>
+    </section>
+  );
+};
 
 export default WhoWeAre;

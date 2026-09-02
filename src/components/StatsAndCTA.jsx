@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom'; // <-- ADDED: For routing
 
 const StatsAndCTA = () => {
   // Gincube Stats Data
@@ -66,10 +67,13 @@ const StatsAndCTA = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-             {/* Golden Orange button on Navy background for maximum contrast */}
-             <button className="bg-gradient-to-r from-[#EA9F24] to-[#F3C57B] text-[#0D1F2D] hover:shadow-[0_10px_30px_rgba(234,159,36,0.35)] px-10 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:-translate-y-1">
+             {/* 👇 UPDATED: Changed button to Link for internal routing */}
+             <Link 
+               to="/startup-registration"
+               className="inline-block bg-gradient-to-r from-[#EA9F24] to-[#F3C57B] text-[#0D1F2D] hover:shadow-[0_10px_30px_rgba(234,159,36,0.35)] px-10 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:-translate-y-1"
+             >
                Start Your Journey Now
-             </button>
+             </Link>
           </motion.div>
         </div>
       </section>

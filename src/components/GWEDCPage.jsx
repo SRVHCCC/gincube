@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useAnimation, animate } from 'framer-motion';
+import API_URL from "../components/Config"; // Load API URL from Config
 
 /* ─────────────────────────────────────────
    BRAND TOKENS (Modernized Navy Blue & Golden Orange)
@@ -245,9 +246,14 @@ const OfferingCard = ({ item, index }) => {
   );
 };
 
+/* ─────────────────────────────────────────
+   FORM INTEGRATED WITH APIS
+───────────────────────────────────────── */
 const JoinForm = () => {
-  const [form, setForm] = useState({ name: '', email: '', mobile: '', location: '', idea: '' });
+  const [form, setForm] = useState({ name: '', email: '', mobile: '', location: '', idea: '', bot_field: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
 
@@ -269,9 +275,73 @@ const JoinForm = () => {
     e.target.style.boxShadow = 'none';
   };
 
-  const handleSubmit = e => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'mobile') {
+      const onlyNums = value.replace(/[^0-9]/g, '');
+      setForm(p => ({ ...p, [name]: onlyNums }));
+    } else {
+      setForm(p => ({ ...p, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (form.bot_field !== '') return; // Honeypot trap
+
+    setIsSubmitting(true);
+
+    // Extract Incubation ID securely from env variables or use fallback
+    const incubationId = import.meta.env.VITE_INCUBATION_ID || "6ab39542497aa33526fcd95b";
+    
+    // Using womencell/apply endpoint as GWEDC is the Women Cell
+    const nodeEndpoint = API_URL ? `${API_URL}/womencell/apply` : 'https://incubationmasters.com/api/womencell/apply';
+
+    // --- 1. Payload for Node.js API ---
+    const nodePayload = {
+      incubationId: incubationId,
+      applicantName: form.name,
+      email: form.email,
+      mobile: form.mobile,
+      location: form.location,
+      startupIdea: form.idea
+    };
+
+    // --- 2. Payload for RiseJhansi Legacy API ---
+    const risePayload = new FormData();
+    risePayload.append('applicant_name', form.name);
+    risePayload.append('email_id', form.email);
+    risePayload.append('mobile_no', form.mobile);
+    risePayload.append('location', form.location);
+    risePayload.append('startupidea', form.idea);
+
+    try {
+      const [nodeRes, riseRes] = await Promise.allSettled([
+        fetch(nodeEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(nodePayload)
+        }),
+        fetch('https://risejhansi.in/Manikarnika/joinProgram', {
+          method: 'POST',
+          body: risePayload
+        })
+      ]);
+
+      const isNodeSuccess = nodeRes.status === 'fulfilled' && nodeRes.value.ok;
+      const isRiseSuccess = riseRes.status === 'fulfilled' && riseRes.value.ok;
+
+      if (isNodeSuccess || isRiseSuccess) {
+        setSubmitted(true);
+      } else {
+        alert("Failed to submit application. Please try again.");
+      }
+    } catch (err) {
+      console.error("API Error:", err);
+      alert("Network Error occurred while submitting.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -317,15 +387,19 @@ const JoinForm = () => {
             Take the first step towards your entrepreneurial journey.
           </p>
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+            
+            {/* Honeypot Field */}
+            <input type="text" name="bot_field" value={form.bot_field} onChange={handleChange} style={{ display: 'none' }} />
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginBottom: 20 }}>
               <div>
                 <label style={{ fontSize: 13, fontWeight: 700, color: C.heading, display: 'block', marginBottom: 8 }}>Your Name *</label>
-                <input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                <input required name="name" value={form.name} onChange={handleChange}
                   placeholder="Priya Sharma" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
               </div>
               <div>
                 <label style={{ fontSize: 13, fontWeight: 700, color: C.heading, display: 'block', marginBottom: 8 }}>Email ID *</label>
-                <input required type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                <input required type="email" name="email" value={form.email} onChange={handleChange}
                   placeholder="priya@example.com" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
               </div>
             </div>
@@ -333,35 +407,37 @@ const JoinForm = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginBottom: 20 }}>
               <div>
                 <label style={{ fontSize: 13, fontWeight: 700, color: C.heading, display: 'block', marginBottom: 8 }}>Mobile No. *</label>
-                <input required type="tel" value={form.mobile} onChange={e => setForm(p => ({ ...p, mobile: e.target.value }))}
-                  placeholder="9876543210" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
+                <input required type="tel" name="mobile" value={form.mobile} onChange={handleChange}
+                  placeholder="9876543210" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} maxLength="15" />
               </div>
               <div>
                 <label style={{ fontSize: 13, fontWeight: 700, color: C.heading, display: 'block', marginBottom: 8 }}>Location *</label>
-                <input required value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
+                <input required name="location" value={form.location} onChange={handleChange}
                   placeholder="Gwalior, MP" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
               </div>
             </div>
 
             <div style={{ marginBottom: 32 }}>
               <label style={{ fontSize: 13, fontWeight: 700, color: C.heading, display: 'block', marginBottom: 8 }}>Describe your startup idea *</label>
-              <textarea required rows={4} value={form.idea} onChange={e => setForm(p => ({ ...p, idea: e.target.value }))}
+              <textarea required rows={4} name="idea" value={form.idea} onChange={handleChange}
                 placeholder="Tell us about your business idea, the problem it solves..."
                 style={{ ...inputStyle, resize: 'vertical', minHeight: 120 }} onFocus={handleFocus} onBlur={handleBlur} />
             </div>
 
             <motion.button
               type="submit"
-              whileHover={{ y: -3, boxShadow: '0 16px 40px rgba(245, 166, 35, 0.35)' }}
-              whileTap={{ scale: 0.98 }}
+              disabled={isSubmitting}
+              whileHover={{ y: isSubmitting ? 0 : -3, boxShadow: isSubmitting ? 'none' : '0 16px 40px rgba(245, 166, 35, 0.35)' }}
+              whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
               style={{
                 width: '100%', padding: '18px 32px', borderRadius: 14, border: 'none',
                 background: C.accent, color: C.dark, fontWeight: 800, fontSize: 16,
-                fontFamily: 'inherit', cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(245, 166, 35, 0.25)', transition: 'background 0.3s'
+                fontFamily: 'inherit', cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 8px 24px rgba(245, 166, 35, 0.25)', transition: 'background 0.3s',
+                opacity: isSubmitting ? 0.7 : 1
               }}
             >
-              Submit Application ↗
+              {isSubmitting ? 'Processing Application...' : 'Submit Application ↗'}
             </motion.button>
           </form>
         </>
@@ -488,7 +564,7 @@ const GWEDCPage = () => (
     </div>
 
     {/* ══ JOIN FORM SECTION ══ */}
-    <div style={{
+    <div id="join" style={{
       background: `linear-gradient(180deg, ${C.dark} 0%, ${C.darkMid} 100%)`,
       padding: 'clamp(80px, 12vw, 120px) clamp(20px, 5vw, 32px)',
       position: 'relative', overflow: 'hidden',
@@ -534,7 +610,7 @@ const GWEDCPage = () => (
               style={{ display: 'inline-flex', alignItems: 'center', background: C.primary, color: C.white, textDecoration: 'none', fontWeight: 800, fontSize: 16, padding: '16px 36px', borderRadius: 100, transition: 'background 0.3s' }}>
               Apply Now ↗
             </motion.a>
-            <motion.a href="https://gincube.org/gwedc" target="_blank" rel="noopener noreferrer" whileHover={{ y: -4, background: C.lt }} whileTap={{ scale: 0.96 }}
+            <motion.a href="https://gincube.org" target="_blank" rel="noopener noreferrer" whileHover={{ y: -4, background: C.lt }} whileTap={{ scale: 0.96 }}
               style={{ display: 'inline-flex', alignItems: 'center', background: C.white, border: `2px solid ${C.pale}`, color: C.heading, textDecoration: 'none', fontWeight: 800, fontSize: 16, padding: '14px 36px', borderRadius: 100, transition: 'all 0.3s' }}>
               Learn More
             </motion.a>

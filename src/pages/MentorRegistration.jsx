@@ -1,386 +1,430 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { User, Mail, Phone, MapPin, Send, Briefcase, Globe, FileText, Image as ImageIcon } from 'lucide-react';
+import ReCAPTCHA from "react-google-recaptcha";
+import API_URL from "../components/Config"; // Load API URL from Config
+import locationData from '../data/locationdata.json'; // Load local JSON data
 
-// --- COMPLETE INDIA STATES & DISTRICTS DATA ---
-const indiaData = {
-  "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman"],
-  "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna", "Kurnool", "Prakasam", "SPSR Nellore", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
-  "Arunachal Pradesh": ["Anjaw", "Changlang", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Dibang Valley", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
-  "Assam": ["Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tinsukkia", "Udalguri", "West Karbi Anglong"],
-  "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
-  "Chandigarh": ["Chandigarh"],
-  "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar", "Bemetara", "Bijapur", "Bilaspur", "Dantewada", "Dhamtari", "Durg", "Gariaband", "Janjgir-Champa", "Jashpur", "Kabirdham", "Kanker", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sukma", "Surajpur", "Surguja"],
-  "Dadra and Nagar Haveli and Daman and Diu": ["Dadra and Nagar Haveli", "Daman", "Diu"],
-  "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
-  "Goa": ["North Goa", "South Goa"],
-  "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
-  "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
-  "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kinnaur", "Kullu", "Lahaul and Spiti", "Mandi", "Shimla", "Sirmaur", "Solan", "Una"],
-  "Jammu and Kashmir": ["Anantnag", "Bandipora", "Baramulla", "Budgam", "Doda", "Ganderbal", "Jammu", "Kathua", "Kishtwar", "Kulgam", "Kupwara", "Poonch", "Pulwama", "Rajouri", "Ramban", "Reasi", "Samba", "Shopian", "Srinagar", "Udhampur"],
-  "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahibganj", "Saraikela Kharsawan", "Simdega", "West Singhbhum"],
-  "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"],
-  "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
-  "Ladakh": ["Kargil", "Leh"],
-  "Lakshadweep": ["Lakshadweep"],
-  "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Hoshangabad", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Mandla", "Mandsaur", "Morena", "Narsinghpur", "Neemuch", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
-  "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
-  "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
-  "Meghalaya": ["East Garo Hills", "East Jaintia Hills", "East Khasi Hills", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills", "West Jaintia Hills", "West Khasi Hills"],
-  "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Khawzawl", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Saitual", "Serchhip"],
-  "Nagaland": ["Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Peren", "Phek", "Tuensang", "Wokha", "Zunheboto"],
-  "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"],
-  "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"],
-  "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Mansa", "Moga", "Muktsar", "Pathankot", "Patiala", "Rupnagar", "Sangrur", "SAS Nagar", "SBS Nagar", "Tarn Taran"],
-  "Rajasthan": ["Ajmer", "Alwar", "Banswara", "Baran", "Barmer", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kota", "Nagaur", "Pali", "Pratapgarh", "Rajsamand", "Sawai Madhopur", "Sikar", "Sirohi", "Sri Ganganagar", "Tonk", "Udaipur"],
-  "Sikkim": ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
-  "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
-  "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Komaram Bheem Asifabad", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal Rural", "Warangal Urban", "Yadadri Bhuvanagiri"],
-  "Tripura": ["Dhalai", "Gomati", "Khowai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
-  "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Badaun", "Baghpat", "Bahraich", "Balia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
-  "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
-  "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
-};
+gsap.registerPlugin(ScrollTrigger);
 
-// Updated Styling Variables (Navy Blue Professional Theme)
-const C = {
-  primaryText: "#0D1F2D", 
-  gradientStart: "#1F486E", // Deep Navy 
-  gradientEnd: "#287BBE", // Lighter blue
-  buttonBg: "#1F486E", // Updated based on button image
-  border: "#CBD5E1",
-  textLight: "#64748B",
-  red: "#EF4444",
-  blueText: "#287BBE",
-  bg: "#F8FAFC", // Professional light background
-  white: "#FFFFFF",
-};
+export default function MentorRegistration() {
+  const pageRef = useRef(null);
+  const bannerTextRef = useRef(null);
+  const formRef = useRef(null);
+  const recaptchaRef = useRef(null);
 
-const MentorRegistration = () => {
+  // Form State
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    mobile: "",
-    linkedin: "",
-    country: "India", // Defaulted to India for the state/city logic
-    state: "",
-    city: "",
-    yearsInMentorship: "",
-    sectors: [],
-    securityCode: "",
-    isCertified: false,
+    name: '',
+    email: '',
+    mobile: '',
+    designation: '',
+    totalExp: '',
+    aboutUs: '',
+    higherEducation: '',
+    category: 'Tech',
+    gender: 'male',
+    institute: '',
+    country: '', 
+    state: '',   
+    city: '', 
+    linkedin_url: '',
+    specializationIn: '',
+    image: null,
+    bot_field: '' // Honeypot
   });
 
-  const [availableCities, setAvailableCities] = useState([]);
-  const [captcha, setCaptcha] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Generate a random 5-character security code on component mount
+  // Derived states for location dropdowns based on JSON
+  const countriesList = locationData?.countries || [];
+  const indiaStates = locationData?.indiaData ? Object.keys(locationData.indiaData) : [];
+  
+  // Get cities list if "India" and a valid state is selected
+  const availableCities = (formData.country === 'India' && formData.state && locationData?.indiaData[formData.state]) 
+      ? locationData.indiaData[formData.state] 
+      : [];
+
+  // Available Skills/Sectors
+  const availableSkills = [
+    "Legal Expert", "Finance Expert", "Account Expert", "Marketing Expert", 
+    "IT Expert", "Digital Marketing", "Business Strategy Expert", 
+    "Women Entrepreneur Expert", "Startup Expert", "Communication Expert"
+  ];
+
+  // GSAP Animations
   useEffect(() => {
-    generateCaptcha();
+    const ctx = gsap.context(() => {
+      gsap.from(bannerTextRef.current, { y: 40, opacity: 0, duration: 1, ease: "power4.out", delay: 0.1 });
+      gsap.from(formRef.current, { y: 50, opacity: 0, duration: 1, ease: "power4.out", delay: 0.3 });
+    }, pageRef);
+    return () => ctx.revert();
   }, []);
 
-  const generateCaptcha = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let code = "";
-    for (let i = 0; i < 5; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setCaptcha(code);
-  };
-
-  // Standard inputs handler
+  // Handlers
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox" && name === "isCertified") {
-      setFormData({ ...formData, [name]: checked });
+    const { name, value } = e.target;
+    if (name === 'mobile' || name === 'totalExp') {
+      const onlyNums = value.replace(/[^0-9]/g, '');
+      setFormData({ ...formData, [name]: onlyNums });
     } else {
       setFormData({ ...formData, [name]: value });
     }
+    if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
-  // Special handler for State to update Cities dynamically
+  const handleFileChange = (e) => {
+    if(e.target.files && e.target.files[0]) {
+        setFormData({ ...formData, image: e.target.files[0] });
+    }
+  };
+
+  const handleSkillToggle = (skill) => {
+    setSelectedSkills(prev => 
+      prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
+    );
+  };
+
+  const handleCountryChange = (e) => {
+    const val = e.target.value;
+    setFormData({ ...formData, country: val, state: '', city: '' });
+    if (errors.country) setErrors({ ...errors, country: null });
+  };
+
   const handleStateChange = (e) => {
-    const selectedState = e.target.value;
-    setFormData({ ...formData, state: selectedState, city: "" }); // Reset city
-    
-    if (indiaData[selectedState]) {
-      setAvailableCities(indiaData[selectedState]);
-    } else {
-      setAvailableCities([]);
-    }
+    const val = e.target.value;
+    setFormData({ ...formData, state: val, city: '' });
+    if (errors.state) setErrors({ ...errors, state: null });
   };
 
-  // Handle multi-select checkboxes for Sector Expertise
-  const handleSectorChange = (e) => {
-    const { value, checked } = e.target;
-    let updatedSectors = [...formData.sectors];
+  const handleRecaptcha = (token) => {
+    setCaptchaToken(token);
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+    let isValid = true;
+    const requiredFields = ['name', 'email', 'mobile', 'designation', 'totalExp', 'country', 'state', 'city', 'linkedin_url', 'category', 'gender', 'institute'];
     
-    if (checked) {
-      updatedSectors.push(value);
-    } else {
-      updatedSectors = updatedSectors.filter((sector) => sector !== value);
+    requiredFields.forEach(field => {
+      if (!formData[field] || String(formData[field]).trim() === '') {
+        newErrors[field] = 'Required';
+        isValid = false;
+      }
+    });
+
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email';
+      isValid = false;
     }
-    
-    setFormData({ ...formData, sectors: updatedSectors });
+
+    if (!formData.image) {
+      newErrors.image = 'Profile image is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.bot_field !== '') return; // Honeypot block
 
-    if (formData.securityCode !== captcha) {
-      alert("Security code does not match. Please try again.");
-      generateCaptcha();
-      setFormData({ ...formData, securityCode: "" });
-      return;
-    }
+    if (validateForm()) {
+      setIsSubmitting(true);
 
-    setLoading(true);
+      // Extract Incubation ID from .env or fallback to provided ID
+      const incubationId = import.meta.env.VITE_INCUBATION_ID || "6ab39542497aa33526fcd95b";
+      const nodeEndpoint = API_URL ? `${API_URL}/mentors/register` : 'https://incubationmasters.com/api/mentors/register';
 
-    try {
-      // --- API INTEGRATION: Replace this URL with your backend ---
-      const response = await fetch("YOUR_BACKEND_API_URL", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      // --- 1. Payload for Node.js API (Mongoose Model with Multer) ---
+      const nodePayload = new FormData();
+      nodePayload.append('incubationId', incubationId);
+      if(formData.image) nodePayload.append('image', formData.image);
+      nodePayload.append('name', formData.name);
+      nodePayload.append('designation', formData.designation);
+      nodePayload.append('totalExp', formData.totalExp);
+      nodePayload.append('skills', JSON.stringify(selectedSkills));
+      nodePayload.append('languages', JSON.stringify(['English', 'Hindi'])); // Defaulting for UI
+      nodePayload.append('aboutUs', formData.aboutUs || 'Mentor Profile');
+      nodePayload.append('higherEducation', formData.higherEducation || 'Graduate');
+      nodePayload.append('rating', 5); // Default rating
+      nodePayload.append('category', formData.category);
+      nodePayload.append('gender', formData.gender);
+      nodePayload.append('institute', formData.institute);
+      nodePayload.append('email', formData.email);
+      nodePayload.append('mo_number', formData.mobile);
+      nodePayload.append('country', formData.country || 'India');
+      nodePayload.append('state', formData.state); // Added missing state
+      nodePayload.append('city', formData.city);
+      nodePayload.append('linkedin', formData.linkedin_url);
+      nodePayload.append('specializationIn', formData.specializationIn || 'General');
 
-      if (response.ok) {
-        alert("Mentor Data Submitted Successfully!");
-        setFormData({
-          fullName: "", email: "", mobile: "", linkedin: "", country: "India", 
-          state: "", city: "", yearsInMentorship: "", sectors: [], 
-          securityCode: "", isCertified: false
-        });
-        setAvailableCities([]);
-        generateCaptcha();
-      } else {
-        alert("Something went wrong. Please try again.");
+      // --- 2. Payload for RiseJhansi Legacy API ---
+      const risePayload = new FormData();
+      risePayload.append('name', formData.name);
+      risePayload.append('email', formData.email);
+      risePayload.append('mobile', formData.mobile);
+      risePayload.append('country', formData.country);
+      risePayload.append('state', formData.state);
+      risePayload.append('city', formData.city);
+      risePayload.append('linkedin_url', formData.linkedin_url);
+      risePayload.append('no_of_mentor_year', formData.totalExp);
+      risePayload.append('captcha', captchaToken || ''); 
+      
+      // Dynamic Checkbox mapping for RiseJhansi API
+      if (selectedSkills.includes('IT Expert')) risePayload.append('is_it_expert', 1);
+      if (selectedSkills.includes('Business Strategy Expert')) risePayload.append('is_business_strategy_expert', 1);
+      if (selectedSkills.includes('Finance Expert')) risePayload.append('is_finance_expert', 1);
+      if (selectedSkills.includes('Marketing Expert')) risePayload.append('is_marketing_expert', 1);
+
+      try {
+        // Fetching both APIs concurrently
+        const [nodeRes, riseRes] = await Promise.allSettled([
+          fetch(nodeEndpoint, { method: 'POST', body: nodePayload }), // No Content-Type header needed for FormData
+          fetch('https://risejhansi.in/MentorController/saveMentor', { method: 'POST', body: risePayload })
+        ]);
+
+        if ((nodeRes.status === 'fulfilled' && nodeRes.value.ok) || (riseRes.status === 'fulfilled' && riseRes.value.ok)) {
+          alert("Mentor Registration Successful!");
+          window.location.reload(); 
+        } else {
+          alert("Failed to register on servers. Please check your inputs.");
+        }
+      } catch (err) {
+        alert("Network error. Could not connect to servers.");
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error("API Error:", error);
-      alert("Failed to submit. Check your backend API connection.");
-    } finally {
-      setLoading(false);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const sectorOptions = [
-    "Legal Expert", "Finance Expert", "Account Expert", "Marketing Expert",
-    "IT Expert", "Digital Marketing", "Business Strategy Expert", 
-    "Women Entrepreneur Expert", "Startup Expert", "Personality Development Expert", 
-    "Communication Expert"
-  ];
+  // UI HELPER CLASSES (Professional Blue/Navy Theme)
+  const inputStyle = "w-full px-[16px] py-[12px] rounded-[10px] border-2 border-[#CBD5E1] focus:border-[#1F486E] focus:ring-2 focus:ring-[#1F486E]/10 outline-none transition-all text-[#0D1F2D] bg-[#F8FAFC] focus:bg-white text-[0.95rem] font-medium";
+  const labelStyle = "flex items-center text-[0.95rem] font-bold text-[#0D1F2D] mb-2";
+  const sectionHeadingStyle = "text-[1.3rem] font-bold text-[#0D1F2D] mb-6 flex items-center border-b border-[#CBD5E1]/50 pb-3";
+  const errorStyle = "text-[#EF4444] text-[0.8rem] mt-1.5 font-medium";
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: C.bg, fontFamily: "sans-serif", padding: "40px" }}>
+    <main ref={pageRef} className="flex-grow bg-[#F8FAFC] min-h-screen pt-20 pb-24 font-['Inter',sans-serif]">
       
-      {/* Breadcrumb */}
-      <div style={{ display: "flex", gap: "8px", fontSize: "14px", color: C.textLight, marginBottom: "60px", fontWeight: 500 }}>
-        <span>🏠 Home</span> » <span style={{ color: C.buttonBg, fontWeight: 600 }}>Mentor Registration</span>
+      {/* ================= TOP BANNER (Dark Navy Theme) ================= */}
+      <div className="w-full bg-[#0D1F2D] py-24 relative overflow-hidden shadow-inner">
+        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[60%] rounded-full bg-[#287BBE]/20 blur-[120px]"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#1F486E]/40 blur-[100px]"></div>
+        
+        <div ref={bannerTextRef} className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10">
+          <div className="inline-block px-[16px] py-[6px] rounded-full bg-[#287BBE]/10 border border-[#287BBE]/30 text-[#287BBE] font-semibold text-sm mb-6 backdrop-blur-sm shadow-sm">
+            Empower Innovators
+          </div>
+          <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4rem] font-extrabold text-white tracking-tight mb-6 leading-tight">
+            Mentor <span className="text-[#287BBE]">Registration</span>
+          </h1>
+          <p className="text-[#CBD5E1] text-[1.1rem] font-medium max-w-2xl mx-auto leading-relaxed">
+            Share your expertise, guide startups toward success, and become a part of the G.Incube ecosystem.
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", maxWidth: "1200px", margin: "0 auto", gap: "60px" }}>
-        
-        {/* Left Column */}
-        <div style={{ flex: "1 1 400px" }}>
-          <h2 style={{ fontSize: "32px", fontWeight: 700, margin: "0 0 10px 0", color: C.primaryText }}>
-            Want to join G.Incube as a<br />Mentor ?
-          </h2>
-          <h1 style={{ 
-            fontSize: "64px", 
-            fontWeight: 900, 
-            margin: "0 0 40px 0",
-            background: `linear-gradient(90deg, ${C.gradientStart}, ${C.gradientEnd})`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            lineHeight: 1.1
-          }}>
-            Let’s fill<br />the form!
-          </h1>
-          <a href="mailto:connect@gincube.org" style={{ fontSize: "18px", color: C.buttonBg, textDecoration: "none", fontWeight: 600, borderBottom: `2px solid ${C.buttonBg}` }}>
-            connect@gincube.org
-          </a>
-        </div>
-
-        {/* Right Column (Form) */}
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-          style={{ flex: "2 1 600px", maxWidth: "700px", background: C.white, padding: "40px", borderRadius: "16px", boxShadow: "0 10px 40px rgba(21, 67, 107, 0.05)" }}
-        >
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* ================= FORM CONTAINER ================= */}
+      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+        <div ref={formRef} className="bg-white p-[30px] md:p-[50px] rounded-[20px] shadow-[0_15px_40px_rgba(31,72,110,0.08)] border border-[#CBD5E1]/50 border-t-[5px] border-t-[#1F486E]">
+          <form onSubmit={handleSubmit} noValidate>
             
-            <InputField label="Full Name" name="fullName" required placeholder="Enter Name" value={formData.fullName} onChange={handleChange} />
-            <InputField label="Email" name="email" type="email" required placeholder="Enter Email" value={formData.email} onChange={handleChange} />
-            <InputField label="Mobile" name="mobile" type="tel" required placeholder="Mobile Number" value={formData.mobile} onChange={handleChange} />
-            <InputField label="LinkedIn URL" name="linkedin" type="url" optional placeholder="Enter LinkedIn URL" value={formData.linkedin} onChange={handleChange} />
-            
-            <SelectField label="Country" name="country" required value={formData.country} onChange={handleChange} options={["India"]} />
-            
-            {/* Dynamic State Dropdown */}
-            <SelectField 
-              label="State" name="state" required placeholder="Select State" 
-              value={formData.state} onChange={handleStateChange} 
-              options={Object.keys(indiaData)} 
-            />
+            {/* Honeypot */}
+            <input type="text" name="bot_field" value={formData.bot_field} onChange={handleChange} className="hidden" />
 
-            {/* Dynamic City (Jile) Dropdown */}
-            <SelectField 
-              label="City" name="city" required placeholder={formData.state ? "Select City" : "Select State First"}
-              value={formData.city} onChange={handleChange} 
-              options={availableCities} 
-              disabled={!formData.state}
-            />
+            {/* --- 1. PERSONAL DETAILS --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <User className="w-5 h-5 mr-2 text-[#1F486E]" /> Personal & Contact Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelStyle}>Full Name <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="text" name="name" className={`${inputStyle} ${errors.name ? 'border-[#EF4444]' : ''}`} value={formData.name} onChange={handleChange} placeholder="Enter your name" />
+                  {errors.name && <p className={errorStyle}>{errors.name}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}><Mail className="w-4 h-4 mr-1 text-[#1F486E]"/> Email <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="email" name="email" className={`${inputStyle} ${errors.email ? 'border-[#EF4444]' : ''}`} value={formData.email} onChange={handleChange} placeholder="Email address" />
+                  {errors.email && <p className={errorStyle}>{errors.email}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}><Phone className="w-4 h-4 mr-1 text-[#1F486E]"/> Mobile <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="tel" name="mobile" className={`${inputStyle} ${errors.mobile ? 'border-[#EF4444]' : ''}`} value={formData.mobile} onChange={handleChange} placeholder="10-digit number" maxLength="15" />
+                  {errors.mobile && <p className={errorStyle}>{errors.mobile}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}>Gender <span className="text-[#EF4444] ml-1">*</span></label>
+                  <select name="gender" className={inputStyle} value={formData.gender} onChange={handleChange}>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-            <SelectField label="Number of years in Mentorship" name="yearsInMentorship" optional placeholder="Select One" value={formData.yearsInMentorship} onChange={handleChange} options={["1-3 Years", "3-5 Years", "5-10 Years", "10+ Years"]} />
+            {/* --- 2. PROFESSIONAL DETAILS --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <Briefcase className="w-5 h-5 mr-2 text-[#1F486E]" /> Professional Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelStyle}>Current Designation <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="text" name="designation" className={`${inputStyle} ${errors.designation ? 'border-[#EF4444]' : ''}`} value={formData.designation} onChange={handleChange} placeholder="e.g. CEO, Senior Developer" />
+                  {errors.designation && <p className={errorStyle}>{errors.designation}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}>Total Experience (Years) <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="text" name="totalExp" className={`${inputStyle} ${errors.totalExp ? 'border-[#EF4444]' : ''}`} value={formData.totalExp} onChange={handleChange} placeholder="e.g. 10" />
+                  {errors.totalExp && <p className={errorStyle}>{errors.totalExp}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}>Institute / Company <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="text" name="institute" className={`${inputStyle} ${errors.institute ? 'border-[#EF4444]' : ''}`} value={formData.institute} onChange={handleChange} placeholder="Where do you work/teach?" />
+                  {errors.institute && <p className={errorStyle}>{errors.institute}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}>Higher Education <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <input type="text" name="higherEducation" className={inputStyle} value={formData.higherEducation} onChange={handleChange} placeholder="e.g. MBA, Ph.D" />
+                </div>
+                <div>
+                  <label className={labelStyle}>Mentor Category <span className="text-[#EF4444] ml-1">*</span></label>
+                  <select name="category" className={inputStyle} value={formData.category} onChange={handleChange}>
+                    <option value="Tech">Technical</option>
+                    <option value="Non Technical">Non Technical</option>
+                    <option value="Business Strategy">Business Strategy</option>
+                    <option value="Funding">Funding & Finance</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1 text-[#1F486E]" /> LinkedIn URL <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="url" name="linkedin_url" className={`${inputStyle} ${errors.linkedin_url ? 'border-[#EF4444]' : ''}`} value={formData.linkedin_url} onChange={handleChange} placeholder="https://linkedin.com/in/..." />
+                  {errors.linkedin_url && <p className={errorStyle}>{errors.linkedin_url}</p>}
+                </div>
+                <div className="md:col-span-2">
+                  <label className={labelStyle}><ImageIcon className="w-4 h-4 mr-1 text-[#1F486E]" /> Profile Image <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="file" accept="image/*" className={`${inputStyle} bg-white`} onChange={handleFileChange} />
+                  {errors.image && <p className={errorStyle}>{errors.image}</p>}
+                </div>
+              </div>
+            </div>
 
-            {/* Checkboxes for Sector Expertise */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "10px" }}>
-              <Label text="Sector Expertise:" optional />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginTop: "8px" }}>
-                {sectorOptions.map((sector, index) => (
-                  <label key={index} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
+            {/* --- 3. LOCATION --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <MapPin className="w-5 h-5 mr-2 text-[#1F486E]" /> Location Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className={labelStyle}>Country <span className="text-[#EF4444] ml-1">*</span></label>
+                  <select name="country" className={`${inputStyle} ${errors.country ? 'border-[#EF4444]' : ''}`} value={formData.country} onChange={handleCountryChange}>
+                    <option value="" disabled>Select Country</option>
+                    {countriesList.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
+                  </select>
+                  {errors.country && <p className={errorStyle}>{errors.country}</p>}
+                </div>
+
+                <div>
+                  <label className={labelStyle}>State <span className="text-[#EF4444] ml-1">*</span></label>
+                  {formData.country === 'India' ? (
+                    <select name="state" className={`${inputStyle} ${errors.state ? 'border-[#EF4444]' : ''}`} value={formData.state} onChange={handleStateChange}>
+                      <option value="" disabled>Select State</option>
+                      {indiaStates.map((s, idx) => <option key={idx} value={s}>{s}</option>)}
+                    </select>
+                  ) : (
+                    <input type="text" name="state" placeholder="Enter State" value={formData.state} onChange={handleChange} className={`${inputStyle} ${errors.state ? 'border-[#EF4444]' : ''}`} disabled={!formData.country} />
+                  )}
+                  {errors.state && <p className={errorStyle}>{errors.state}</p>}
+                </div>
+
+                <div>
+                  <label className={labelStyle}>City <span className="text-[#EF4444] ml-1">*</span></label>
+                  {formData.country === 'India' && availableCities.length > 0 ? (
+                    <select name="city" className={`${inputStyle} ${errors.city ? 'border-[#EF4444]' : ''}`} value={formData.city} onChange={handleChange}>
+                      <option value="" disabled>Select City</option>
+                      {availableCities.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
+                    </select>
+                  ) : (
+                    <input type="text" name="city" placeholder="Enter City" value={formData.city} onChange={handleChange} className={`${inputStyle} ${errors.city ? 'border-[#EF4444]' : ''}`} disabled={!formData.state} />
+                  )}
+                  {errors.city && <p className={errorStyle}>{errors.city}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* --- 4. SKILLS & EXPERTISE --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <FileText className="w-5 h-5 mr-2 text-[#1F486E]" /> Expertise & Skills
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                {availableSkills.map((skill, i) => (
+                  <label key={i} className="flex items-center space-x-3 cursor-pointer bg-[#F8FAFC] p-3 rounded-[10px] border border-[#CBD5E1]/50 hover:border-[#1F486E] hover:bg-white transition-colors">
                     <input 
                       type="checkbox" 
-                      value={sector} 
-                      checked={formData.sectors.includes(sector)} 
-                      onChange={handleSectorChange} 
-                      style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: C.buttonBg }} 
+                      className="w-4 h-4 accent-[#1F486E] cursor-pointer" 
+                      checked={selectedSkills.includes(skill)}
+                      onChange={() => handleSkillToggle(skill)}
                     />
-                    {sector}
+                    <span className="text-[0.9rem] font-semibold text-[#0D1F2D]">{skill}</span>
                   </label>
                 ))}
               </div>
+              
+              <label className={labelStyle}>About Your Experience <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+              <textarea 
+                name="aboutUs" 
+                rows="4" 
+                className={`${inputStyle} resize-none`} 
+                value={formData.aboutUs} 
+                onChange={handleChange} 
+                placeholder="Brief bio about your mentoring experience..."
+              ></textarea>
             </div>
 
-            {/* Security Code */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "10px", padding: "20px", background: C.bg, borderRadius: "8px" }}>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: C.textLight, textTransform: "uppercase", letterSpacing: "1px" }}>Security Code</span>
-              <div style={{ fontSize: "22px", letterSpacing: "6px", color: C.primaryText, fontWeight: 800, fontFamily: "monospace" }}>
-                {captcha}
-              </div>
-              <input 
-                type="text" 
-                name="securityCode" 
-                value={formData.securityCode} 
-                onChange={handleChange} 
-                required 
-                placeholder="Enter code"
-                style={{ ...inputBaseStyles, width: "160px", textAlign: "center", borderColor: C.border, fontWeight: 600, letterSpacing: "2px" }} 
+            {/* --- 5. SECURITY (OPTIONAL CAPTCHA) --- */}
+            <div className="mt-8 bg-[#F8FAFC] p-6 rounded-[12px] border border-[#CBD5E1]/50 flex flex-col items-center">
+              <label className="text-[0.85rem] font-bold text-[#64748B] uppercase tracking-wider mb-4">
+                  Security Verification <span className="font-normal normal-case">(Optional)</span>
+              </label>
+              
+              {/* Uses the key from your .env file */}
+              <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_KEY || "YOUR_FALLBACK_SITE_KEY_IF_ENV_IS_MISSING"}
+                  onChange={handleRecaptcha}
               />
             </div>
 
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
-                <input 
-                  type="checkbox" 
-                  name="isCertified" 
-                  required 
-                  checked={formData.isCertified} 
-                  onChange={handleChange} 
-                  style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: C.buttonBg }} 
-                />
-                I hereby certify that the above given information is true and accurate<span style={{ color: C.red }}>*</span>
-              </label>
-            </div>
-
-            {/* UPDATED SUBMIT BUTTON (Smaller Size) */}
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 8px 20px rgba(31, 72, 110, 0.25)" }} 
-                whileTap={{ scale: 0.98 }}
-                disabled={loading}
-                style={{
-                  background: C.buttonBg, // Dark Navy Blue
-                  color: "#ffffff", 
-                  border: "none", 
-                  padding: "12px 32px", // Smaller padding for a smaller button
-                  borderRadius: "8px", // Standard radius
-                  fontSize: "15px", // Slightly smaller font
-                  fontWeight: 600, 
-                  cursor: loading ? "not-allowed" : "pointer",
-                  width: "100%",
-                  maxWidth: "220px", // Reduced max width to make it compact
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  boxShadow: "0 4px 14px rgba(28, 69, 108, 0.2)",
-                  transition: "box-shadow 0.2s"
-                }}
+            {/* --- 6. SUBMIT BUTTON --- */}
+            <div className="mt-10 text-center">
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="inline-flex items-center justify-center px-[50px] py-[18px] bg-[#1F486E] hover:bg-[#163654] text-white font-bold rounded-[50px] text-[1.1rem] shadow-[0_10px_25px_rgba(31,72,110,0.25)] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1"
               >
-                {loading ? "Submitting..." : <>Register Investor <span>→</span></>}
-              </motion.button>
+                {isSubmitting ? (
+                  <><span className="inline-block w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin mr-[10px] align-middle"></span> Processing...</>
+                ) : (
+                  <><Send className="w-5 h-5 mr-2" /> Register as Mentor</>
+                )}
+              </button>
             </div>
 
           </form>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </main>
   );
-};
-
-export default MentorRegistration;
-
-/* --- REUSABLE COMPONENTS & STYLES --- */
-
-const inputBaseStyles = {
-  width: "100%", 
-  padding: "14px 16px", 
-  borderRadius: "8px", 
-  border: `1.5px solid ${C.border}`,
-  fontSize: "14px", 
-  outline: "none", 
-  transition: "border 0.2s, box-shadow 0.2s", 
-  boxSizing: "border-box", 
-  backgroundColor: C.white,
-  color: C.primaryText,
-  fontWeight: 500
-};
-
-const Label = ({ text, required, optional }) => (
-  <label style={{ fontSize: "14px", fontWeight: 700, color: C.primaryText }}>
-    {text} 
-    {required && <span style={{ color: C.red }}> *</span>}
-    {optional && <span style={{ color: C.textLight, fontWeight: 500, fontSize: "12px" }}> (Optional)</span>}
-  </label>
-);
-
-const InputField = ({ label, required, optional, disabled, ...props }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-    <Label text={label} required={required} optional={optional} />
-    <input 
-      style={{ 
-        ...inputBaseStyles, 
-        opacity: disabled ? 0.6 : 1, 
-        cursor: disabled ? "not-allowed" : "text" 
-      }} 
-      disabled={disabled} 
-      {...props} 
-      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
-      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
-    />
-  </div>
-);
-
-const SelectField = ({ label, required, optional, options, placeholder, disabled, ...props }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-    <Label text={label} required={required} optional={optional} />
-    <select 
-      style={{ 
-        ...inputBaseStyles, 
-        color: props.value ? C.primaryText : C.textLight, 
-        cursor: disabled ? "not-allowed" : "pointer", 
-        opacity: disabled ? 0.6 : 1 
-      }} 
-      disabled={disabled} 
-      {...props}
-      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
-      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
-    >
-      {placeholder && <option value="" disabled>{placeholder}</option>}
-      {options && options.map((opt, i) => (
-        <option key={i} value={opt}>{opt}</option>
-      ))}
-    </select>
-  </div>
-);
+}

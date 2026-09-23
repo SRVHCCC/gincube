@@ -1,377 +1,430 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import locationData from "../data/locationData.json"; // Importing your JSON data
+import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { User, Mail, Phone, MapPin, Send, Building, Globe, FileText, Image as ImageIcon, Briefcase } from 'lucide-react';
+import ReCAPTCHA from "react-google-recaptcha";
+import API_URL from "../components/Config"; // Load API URL from Config
+import locationData from '../data/locationdata.json'; // Load local JSON data
 
-// Updated Styling Variables (Navy Blue Professional Theme)
-const C = {
-  primaryText: "#0D1F2D", 
-  gradientStart: "#1F486E", // Deep Navy 
-  gradientEnd: "#287BBE", // Lighter blue
-  buttonBg: "#1F486E", // Professional Navy Blue Button
-  border: "#CBD5E1",
-  textLight: "#64748B",
-  red: "#EF4444",
-  blueText: "#287BBE",
-  bg: "#F8FAFC", // Professional light background
-  white: "#FFFFFF",
-};
+gsap.registerPlugin(ScrollTrigger);
 
-const InvestorRegistration = () => {
+export default function InvestorRegistration() {
+  const pageRef = useRef(null);
+  const bannerTextRef = useRef(null);
+  const formRef = useRef(null);
+  const recaptchaRef = useRef(null);
+
+  // Form State
   const [formData, setFormData] = useState({
-    investorName: "",
-    companyName: "",
-    investorType: "",
-    email: "",
-    mobile: "",
-    linkedin: "",
-    country: "",
-    state: "",
-    city: "",
-    investmentLimit: "",
-    startupStages: [],
-    companiesFunded: "",
-    securityCode: "",
-    isCertified: false,
+    companyName: '',
+    investorName: '',
+    email: '',
+    mobile: '',
+    country: '', 
+    state: '',   
+    city: '',    
+    companyFund: '',
+    investmentLimit: '',
+    investorType: '',
+    linkedinProfile: '',
+    website: '',
+    shortDescription: '',
+    fullDescription: '',
+    firmLogo: null,
+    bot_field: '' // Honeypot
   });
 
-  const [captcha, setCaptcha] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [selectedStages, setSelectedStages] = useState([]);
+  const [selectedIndustries, setSelectedIndustries] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Generate a random 5-character security code on component mount
+  const availableStages = ['Ideation', 'Validation', 'Prototype/MVP', 'Scaling'];
+  const availableIndustries = ['EdTech', 'FinTech', 'HealthTech', 'AgriTech', 'E-Commerce', 'SaaS', 'Other'];
+
+  // Derived states for location dropdowns based on JSON
+  const countriesList = locationData?.countries || [];
+  const indiaStates = locationData?.indiaData ? Object.keys(locationData.indiaData) : [];
+  
+  // Get cities list if "India" and a valid state is selected
+  const availableCities = (formData.country === 'India' && formData.state && locationData?.indiaData[formData.state]) 
+      ? locationData.indiaData[formData.state] 
+      : [];
+
+  // GSAP Animations
   useEffect(() => {
-    generateCaptcha();
+    const ctx = gsap.context(() => {
+      gsap.from(bannerTextRef.current, { y: 40, opacity: 0, duration: 1, ease: "power4.out", delay: 0.1 });
+      gsap.from(formRef.current, { y: 50, opacity: 0, duration: 1, ease: "power4.out", delay: 0.3 });
+    }, pageRef);
+    return () => ctx.revert();
   }, []);
 
-  const generateCaptcha = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let code = "";
-    for (let i = 0; i < 5; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setCaptcha(code);
-  };
-
-  // Standard input handler
+  // Handlers
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox" && name === "isCertified") {
-      setFormData({ ...formData, [name]: checked });
+    const { name, value } = e.target;
+    if (name === 'mobile') {
+      const onlyNums = value.replace(/[^0-9]/g, '');
+      setFormData({ ...formData, [name]: onlyNums });
     } else {
       setFormData({ ...formData, [name]: value });
     }
+    if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
-  // Handler for Checkbox Group (Startup Stages)
-  const handleStageChange = (e) => {
-    const { value, checked } = e.target;
-    let updatedStages = [...formData.startupStages];
-    
-    if (checked) {
-      updatedStages.push(value);
-    } else {
-      updatedStages = updatedStages.filter((stage) => stage !== value);
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, firmLogo: e.target.files[0] });
     }
-    
-    setFormData({ ...formData, startupStages: updatedStages });
   };
 
-  // Handler for Country selection
   const handleCountryChange = (e) => {
-    const selectedCountry = e.target.value;
-    setFormData({
-      ...formData,
-      country: selectedCountry,
-      state: "", 
-      city: "",  
-    });
+    const val = e.target.value;
+    setFormData({ ...formData, country: val, state: '', city: '' });
+    if (errors.country) setErrors({ ...errors, country: null });
   };
 
-  // Handler for State selection (Only triggers for India)
   const handleStateChange = (e) => {
-    const selectedState = e.target.value;
-    setFormData({
-      ...formData,
-      state: selectedState,
-      city: "", 
+    const val = e.target.value;
+    setFormData({ ...formData, state: val, city: '' });
+    if (errors.state) setErrors({ ...errors, state: null });
+  };
+
+  const toggleArrayItem = (item, array, setArray) => {
+    setArray(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+  };
+
+  const handleRecaptcha = (token) => {
+    setCaptchaToken(token);
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+    let isValid = true;
+    const requiredFields = ['investorName', 'email', 'mobile', 'country', 'state', 'city', 'investorType'];
+    
+    requiredFields.forEach(field => {
+      if (!formData[field] || String(formData[field]).trim() === '') {
+        newErrors[field] = 'Required';
+        isValid = false;
+      }
     });
+
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.bot_field !== '') return; // Honeypot block
 
-    if (formData.securityCode !== captcha) {
-      alert("Security code does not match. Please try again.");
-      generateCaptcha();
-      setFormData({ ...formData, securityCode: "" });
-      return;
-    }
+    if (validateForm()) {
+      setIsSubmitting(true);
 
-    setLoading(true);
+      // Extract Incubation ID securely from env variables or use default
+      const incubationId = import.meta.env.VITE_INCUBATION_ID || "6ab39542497aa33526fcd95b";
+      const nodeEndpoint = API_URL ? `${API_URL}/investors/register` : 'https://incubationmasters.com/api/investors/register';
 
-    try {
-      // --- API INTEGRATION: Replace this URL with your backend ---
-      const response = await fetch("YOUR_BACKEND_API_URL", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      // --- 1. Payload for Node.js API (Mongoose Model with Multer) ---
+      const nodePayload = new FormData();
+      nodePayload.append('incubationId', incubationId);
+      if (formData.firmLogo) nodePayload.append('firmLogo', formData.firmLogo);
+      nodePayload.append('investorName', formData.investorName);
+      nodePayload.append('investorType', formData.investorType.toLowerCase().includes('angel') ? 'angel' : 'vc');
+      nodePayload.append('email', formData.email);
+      nodePayload.append('contactNumber', formData.mobile);
+      nodePayload.append('linkedinProfile', formData.linkedinProfile);
+      nodePayload.append('website', formData.website);
+      
+      // Location Data
+      nodePayload.append('country', formData.country);
+      nodePayload.append('state', formData.state);
+      nodePayload.append('city', formData.city);
+      nodePayload.append('locationRaw', `${formData.city}, ${formData.state}, ${formData.country}`);
+      
+      nodePayload.append('shortDescription', formData.shortDescription);
+      nodePayload.append('fullDescription', formData.fullDescription);
+      nodePayload.append('stage', JSON.stringify(selectedStages));
+      nodePayload.append('industry', JSON.stringify(selectedIndustries));
 
-      if (response.ok) {
-        alert("Investor Data Submitted Successfully!");
-        setFormData({
-          investorName: "", companyName: "", investorType: "", email: "", mobile: "", 
-          linkedin: "", country: "", state: "", city: "", investmentLimit: "", 
-          startupStages: [], companiesFunded: "", securityCode: "", isCertified: false
-        });
-        generateCaptcha();
-      } else {
-        alert("Something went wrong. Please try again.");
+      // --- 2. Payload for RiseJhansi Legacy API ---
+      const risePayload = new FormData();
+      risePayload.append('company_name', formData.companyName || 'Individual');
+      risePayload.append('investor_name', formData.investorName);
+      risePayload.append('email', formData.email);
+      risePayload.append('mobile', formData.mobile);
+      risePayload.append('country', formData.country);
+      risePayload.append('state', formData.state);
+      risePayload.append('city', formData.city);
+      risePayload.append('company_fund', formData.companyFund);
+      risePayload.append('investment_limit', formData.investmentLimit);
+      risePayload.append('investor_type', formData.investorType);
+      
+      // Dynamic Checkbox mapping for RiseJhansi API
+      if (selectedStages.includes('Ideation')) risePayload.append('stage_ideation', 1);
+      if (selectedStages.includes('Validation')) risePayload.append('stage_validation', 1);
+      
+      risePayload.append('code_again', 'BYPASS'); // RiseJhansi Legacy Bypass
+      risePayload.append('captcha', captchaToken || ''); // Optional Captcha
+
+      try {
+        // Run both API calls concurrently using fetch
+        const [nodeRes, riseRes] = await Promise.allSettled([
+          fetch(nodeEndpoint, { method: 'POST', body: nodePayload }), // FormData sets boundaries automatically
+          fetch('https://risejhansi.in/InvestorController/saveInvestor', { method: 'POST', body: risePayload })
+        ]);
+
+        const isNodeSuccess = nodeRes.status === 'fulfilled' && nodeRes.value.ok;
+        const isRiseSuccess = riseRes.status === 'fulfilled' && riseRes.value.ok;
+
+        if (isNodeSuccess || isRiseSuccess) {
+          alert("Investor Registration Successful!");
+          window.location.reload(); 
+        } else {
+          alert("Failed to register on servers. Please try again.");
+        }
+      } catch (err) {
+        console.error("API Error:", err);
+        alert("Network error. Could not submit form.");
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error("API Error:", error);
-      alert("Failed to submit. Check your backend API connection.");
-    } finally {
-      setLoading(false);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
+  // UI HELPER CLASSES (Professional Blue/Navy Theme)
+  const inputStyle = "w-full px-[16px] py-[12px] rounded-[10px] border-2 border-[#CBD5E1] focus:border-[#1F486E] focus:ring-2 focus:ring-[#1F486E]/10 outline-none transition-all text-[#0D1F2D] bg-[#F8FAFC] focus:bg-white text-[0.95rem] font-medium";
+  const labelStyle = "flex items-center text-[0.95rem] font-bold text-[#0D1F2D] mb-2";
+  const sectionHeadingStyle = "text-[1.3rem] font-bold text-[#0D1F2D] mb-6 flex items-center border-b border-[#CBD5E1]/50 pb-3";
+  const errorStyle = "text-[#EF4444] text-[0.8rem] mt-1.5 font-medium";
+
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: C.bg, fontFamily: "sans-serif", padding: "40px" }}>
+    <main ref={pageRef} className="flex-grow bg-[#F8FAFC] min-h-screen pt-20 pb-24 font-['Inter',sans-serif]">
       
-      {/* Breadcrumb */}
-      <div style={{ display: "flex", gap: "8px", fontSize: "14px", color: C.textLight, marginBottom: "60px", fontWeight: 500 }}>
-        <span>🏠 Home</span> » <span style={{ color: C.buttonBg, fontWeight: 600 }}>Investor Registration</span>
+      {/* ================= TOP BANNER (Dark Navy Theme) ================= */}
+      <div className="w-full bg-[#0D1F2D] py-24 relative overflow-hidden shadow-inner">
+        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[60%] rounded-full bg-[#287BBE]/20 blur-[120px]"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#1F486E]/40 blur-[100px]"></div>
+        
+        <div ref={bannerTextRef} className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10">
+          <div className="inline-block px-[16px] py-[6px] rounded-full bg-[#287BBE]/10 border border-[#287BBE]/30 text-[#287BBE] font-semibold text-sm mb-6 backdrop-blur-sm shadow-sm">
+            Catalyst For Change
+          </div>
+          <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4rem] font-extrabold text-white tracking-tight mb-6 leading-tight">
+            Investor <span className="text-[#287BBE]">Registration</span>
+          </h1>
+          <p className="text-[#CBD5E1] text-[1.1rem] font-medium max-w-2xl mx-auto leading-relaxed">
+            Discover high-potential startups and innovative ideas! Invest in the future with the G.Incube ecosystem.
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", maxWidth: "1200px", margin: "0 auto", gap: "60px" }}>
-        
-        {/* Left Column */}
-        <div style={{ flex: "1 1 400px" }}>
-          <h2 style={{ fontSize: "32px", fontWeight: 700, margin: "0 0 10px 0", color: C.primaryText }}>
-            Want to join G.Incube as an<br />Investor ?
-          </h2>
-          <h1 style={{ 
-            fontSize: "64px", 
-            fontWeight: 900, 
-            margin: "0 0 40px 0",
-            background: `linear-gradient(90deg, ${C.gradientStart}, ${C.gradientEnd})`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            lineHeight: 1.1
-          }}>
-            Let’s fill<br />the form!
-          </h1>
-          <a href="mailto:connect@gincube.org" style={{ fontSize: "18px", color: C.buttonBg, textDecoration: "none", fontWeight: 600, borderBottom: `2px solid ${C.buttonBg}` }}>
-            connect@gincube.org
-          </a>
-        </div>
-
-        {/* Right Column (Form) */}
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
-          style={{ flex: "2 1 600px", maxWidth: "700px", background: C.white, padding: "40px", borderRadius: "16px", boxShadow: "0 10px 40px rgba(21, 67, 107, 0.05)" }}
-        >
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* ================= FORM CONTAINER ================= */}
+      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+        <div ref={formRef} className="bg-white p-[30px] md:p-[50px] rounded-[20px] shadow-[0_15px_40px_rgba(31,72,110,0.08)] border border-[#CBD5E1]/50 border-t-[5px] border-t-[#1F486E]">
+          <form onSubmit={handleSubmit} noValidate>
             
-            <InputField label="Investor Name" name="investorName" required placeholder="Enter Name" value={formData.investorName} onChange={handleChange} />
-            <InputField label="Company Name" name="companyName" optional placeholder="Company Name" value={formData.companyName} onChange={handleChange} />
-            <SelectField label="Type of Investor" name="investorType" required placeholder="Select One" value={formData.investorType} onChange={handleChange} options={["Angel Investor", "Venture Capitalist (VC)", "Private Equity (PE)", "Corporate Investor", "Other"]} />
-            <InputField label="Email" name="email" type="email" required placeholder="Enter Email" value={formData.email} onChange={handleChange} />
-            <InputField label="Mobile" name="mobile" type="tel" optional placeholder="Mobile Number" value={formData.mobile} onChange={handleChange} />
-            <InputField label="LinkedIn URL" name="linkedin" type="url" optional placeholder="Enter LinkedIn URL" value={formData.linkedin} onChange={handleChange} />
-            
-            {/* Dynamic Location Logic */}
-            <SelectField 
-              label="Country" name="country" required placeholder="Select Country" 
-              value={formData.country} onChange={handleCountryChange} 
-              options={locationData.countries} 
-            />
-            
-            {formData.country === "India" ? (
-              <SelectField 
-                label="State" name="state" required placeholder="Select State" 
-                value={formData.state} onChange={handleStateChange} 
-                options={Object.keys(locationData.indiaData)} 
-              />
-            ) : (
-              <InputField 
-                label="State" name="state" required placeholder="Enter State" 
-                value={formData.state} onChange={handleChange} 
-                disabled={!formData.country}
-              />
-            )}
+            {/* Honeypot */}
+            <input type="text" name="bot_field" value={formData.bot_field} onChange={handleChange} className="hidden" />
 
-            {formData.country === "India" ? (
-              <SelectField 
-                label="City" name="city" required placeholder={formData.state ? "Select City" : "Select State First"} 
-                value={formData.city} onChange={handleChange} 
-                options={formData.state ? locationData.indiaData[formData.state] : []} 
-                disabled={!formData.state}
-              />
-            ) : (
-              <InputField 
-                label="City" name="city" required placeholder="Enter City" 
-                value={formData.city} onChange={handleChange} 
-                disabled={!formData.country}
-              />
-            )}
-
-            {/* Radio Group: Investment Limit */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <Label text="Investment Limit:" required />
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "15px", marginTop: "4px" }}>
-                {["Upto 2 Lakh", "2-5 Lakh", "More than 5 Lakh"].map((limit) => (
-                  <label key={limit} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
-                    <input 
-                      type="radio" name="investmentLimit" value={limit} 
-                      checked={formData.investmentLimit === limit} onChange={handleChange} required 
-                      style={{ cursor: "pointer", accentColor: C.buttonBg, width: "16px", height: "16px" }}
-                    />
-                    {limit}
-                  </label>
-                ))}
+            {/* --- 1. FIRM & CONTACT DETAILS --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <User className="w-5 h-5 mr-2 text-[#1F486E]" /> Investor Profile
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelStyle}>Firm / Company Name <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <input type="text" name="companyName" className={inputStyle} value={formData.companyName} onChange={handleChange} placeholder="e.g. VC Partners" />
+                </div>
+                <div>
+                  <label className={labelStyle}>Investor Name (Contact Person) <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="text" name="investorName" className={`${inputStyle} ${errors.investorName ? 'border-[#EF4444]' : ''}`} value={formData.investorName} onChange={handleChange} placeholder="Full Name" />
+                  {errors.investorName && <p className={errorStyle}>{errors.investorName}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}><Mail className="w-4 h-4 mr-1 text-[#1F486E]"/> Email <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="email" name="email" className={`${inputStyle} ${errors.email ? 'border-[#EF4444]' : ''}`} value={formData.email} onChange={handleChange} placeholder="Email address" />
+                  {errors.email && <p className={errorStyle}>{errors.email}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}><Phone className="w-4 h-4 mr-1 text-[#1F486E]"/> Mobile <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="tel" name="mobile" className={`${inputStyle} ${errors.mobile ? 'border-[#EF4444]' : ''}`} value={formData.mobile} onChange={handleChange} placeholder="10-digit number" maxLength="15" />
+                  {errors.mobile && <p className={errorStyle}>{errors.mobile}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1 text-[#1F486E]" /> Website <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <input type="url" name="website" className={inputStyle} value={formData.website} onChange={handleChange} placeholder="https://..." />
+                </div>
+                <div>
+                  <label className={labelStyle}><ImageIcon className="w-4 h-4 mr-1 text-[#1F486E]" /> Firm Logo <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <input type="file" accept="image/*" className={`${inputStyle} bg-white`} onChange={handleFileChange} />
+                </div>
               </div>
             </div>
 
-            {/* Checkbox Group: Startup Stage */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "10px" }}>
-              <Label text="Choice of startup stage for investing" />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "4px" }}>
-                {["Ideation", "Validation", "Prototype/MVP", "Scaling"].map((stage) => (
-                  <label key={stage} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
-                    <input 
-                      type="checkbox" value={stage} 
-                      checked={formData.startupStages.includes(stage)} onChange={handleStageChange} 
-                      style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: C.buttonBg }} 
-                    />
-                    {stage}
-                  </label>
-                ))}
+            {/* --- 2. INVESTMENT PREFERENCES --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <Briefcase className="w-5 h-5 mr-2 text-[#1F486E]" /> Investment Preferences
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className={labelStyle}>Type Of Investor <span className="text-[#EF4444] ml-1">*</span></label>
+                  <select name="investorType" className={`${inputStyle} ${errors.investorType ? 'border-[#EF4444]' : ''}`} value={formData.investorType} onChange={handleChange}>
+                    <option value="" disabled>Select investor type</option>
+                    <option value="Angel Investor">Angel Investor</option>
+                    <option value="Venture Capitalist (VC)">Venture Capitalist (VC)</option>
+                    <option value="Institutional Investor">Institutional Investor</option>
+                  </select>
+                  {errors.investorType && <p className={errorStyle}>{errors.investorType}</p>}
+                </div>
+                <div>
+                  <label className={labelStyle}>Investment Limit <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <select name="investmentLimit" className={inputStyle} value={formData.investmentLimit} onChange={handleChange}>
+                    <option value="" disabled>Select Limit</option>
+                    <option value="Upto 2 Lakh">Upto 2 Lakh</option>
+                    <option value="2-5 Lakh">2-5 Lakh</option>
+                    <option value="More than 5 Lakh">More than 5 Lakh</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelStyle}>Number of Companies Funded <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <select name="companyFund" className={inputStyle} value={formData.companyFund} onChange={handleChange}>
+                    <option value="" disabled>Select Number</option>
+                    <option value="0">0</option>
+                    <option value="1-5">1-5</option>
+                    <option value="5+">5+</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1 text-[#1F486E]" /> LinkedIn URL <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <input type="url" name="linkedinProfile" className={inputStyle} value={formData.linkedinProfile} onChange={handleChange} placeholder="https://linkedin.com/in/..." />
+                </div>
+              </div>
+
+              {/* Checkboxes for Stage and Industry */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <label className="block text-[0.95rem] font-bold text-[#0D1F2D] mb-3">Choice of startup stage <span className="text-[#EF4444]">*</span></label>
+                  <div className="flex flex-col gap-3">
+                    {availableStages.map((stage, i) => (
+                      <label key={i} className="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" className="w-4 h-4 accent-[#1F486E] cursor-pointer" checked={selectedStages.includes(stage)} onChange={() => toggleArrayItem(stage, selectedStages, setSelectedStages)} />
+                        <span className="text-[0.9rem] font-medium text-[#0D1F2D]">{stage}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[0.95rem] font-bold text-[#0D1F2D] mb-3">Preferred Industries <span className="text-[#EF4444]">*</span></label>
+                  <div className="flex flex-col gap-3">
+                    {availableIndustries.map((industry, i) => (
+                      <label key={i} className="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" className="w-4 h-4 accent-[#1F486E] cursor-pointer" checked={selectedIndustries.includes(industry)} onChange={() => toggleArrayItem(industry, selectedIndustries, setSelectedIndustries)} />
+                        <span className="text-[0.9rem] font-medium text-[#0D1F2D]">{industry}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <SelectField label="Number of companies funded" name="companiesFunded" optional placeholder="Select One" value={formData.companiesFunded} onChange={handleChange} options={["0 (First Time)", "1-5", "5-10", "10+"]} />
-
-            {/* Security Code */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "10px", padding: "20px", background: C.bg, borderRadius: "8px" }}>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: C.textLight, textTransform: "uppercase", letterSpacing: "1px" }}>Security Code</span>
-              <div style={{ fontSize: "22px", letterSpacing: "6px", color: C.primaryText, fontWeight: 800, fontFamily: "monospace" }}>
-                {captcha}
+            {/* --- 3. LOCATION --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <MapPin className="w-5 h-5 mr-2 text-[#1F486E]" /> Location
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <select name="country" className={`${inputStyle} ${errors.country ? 'border-[#EF4444]' : ''}`} value={formData.country} onChange={handleCountryChange}>
+                    <option value="" disabled>Select Country</option>
+                    {countriesList.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
+                  </select>
+                  {errors.country && <p className={errorStyle}>{errors.country}</p>}
+                </div>
+                <div>
+                  {formData.country === 'India' ? (
+                    <select name="state" className={`${inputStyle} ${errors.state ? 'border-[#EF4444]' : ''}`} value={formData.state} onChange={handleStateChange}>
+                      <option value="" disabled>Select State</option>
+                      {indiaStates.map((s, idx) => <option key={idx} value={s}>{s}</option>)}
+                    </select>
+                  ) : (
+                    <input type="text" name="state" placeholder="Enter State" value={formData.state} onChange={handleChange} className={`${inputStyle} ${errors.state ? 'border-[#EF4444]' : ''}`} disabled={!formData.country} />
+                  )}
+                  {errors.state && <p className={errorStyle}>{errors.state}</p>}
+                </div>
+                <div>
+                  {formData.country === 'India' && availableCities.length > 0 ? (
+                    <select name="city" className={`${inputStyle} ${errors.city ? 'border-[#EF4444]' : ''}`} value={formData.city} onChange={handleChange}>
+                      <option value="" disabled>Select City</option>
+                      {availableCities.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
+                    </select>
+                  ) : (
+                    <input type="text" name="city" placeholder="Enter City" value={formData.city} onChange={handleChange} className={`${inputStyle} ${errors.city ? 'border-[#EF4444]' : ''}`} disabled={!formData.state} />
+                  )}
+                  {errors.city && <p className={errorStyle}>{errors.city}</p>}
+                </div>
               </div>
-              <input 
-                type="text" name="securityCode" value={formData.securityCode} onChange={handleChange} required placeholder="Enter code" 
-                style={{ ...inputBaseStyles, width: "160px", textAlign: "center", borderColor: C.border, fontWeight: 600, letterSpacing: "2px" }} 
-              />
             </div>
 
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: C.primaryText, cursor: "pointer", fontWeight: 500 }}>
-                <input 
-                  type="checkbox" name="isCertified" required checked={formData.isCertified} onChange={handleChange} 
-                  style={{ width: "16px", height: "16px", cursor: "pointer", accentColor: C.buttonBg }} 
-                />
-                I hereby certify that the above given information is true and accurate<span style={{ color: C.red }}>*</span>
+            {/* --- 4. ABOUT --- */}
+            <div className="mb-10">
+              <h3 className={sectionHeadingStyle}>
+                <FileText className="w-5 h-5 mr-2 text-[#1F486E]" /> About the Investor / Firm
+              </h3>
+              <div className="space-y-6">
+                <div>
+                  <label className={labelStyle}>Short Description <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <textarea name="shortDescription" rows="2" className={`${inputStyle} resize-none`} value={formData.shortDescription} onChange={handleChange} placeholder="Brief one-liner about your investment thesis..."></textarea>
+                </div>
+                <div>
+                  <label className={labelStyle}>Full Description <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <textarea name="fullDescription" rows="4" className={`${inputStyle} resize-none`} value={formData.fullDescription} onChange={handleChange} placeholder="Detailed description..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            {/* --- 5. SECURITY (OPTIONAL CAPTCHA) --- */}
+            <div className="mt-8 bg-[#F8FAFC] p-6 rounded-[12px] border border-[#CBD5E1]/50 flex flex-col items-center">
+              <label className="text-[0.85rem] font-bold text-[#64748B] uppercase tracking-wider mb-4">
+                  Security Verification <span className="font-normal normal-case">(Optional)</span>
               </label>
+              
+              {/* Uses the key from your .env file */}
+              <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_KEY || "YOUR_FALLBACK_SITE_KEY_IF_ENV_IS_MISSING"}
+                  onChange={handleRecaptcha}
+              />
             </div>
 
-            {/* SMALL & PROFESSIONAL SUBMIT BUTTON */}
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 8px 20px rgba(31, 72, 110, 0.25)" }} 
-                whileTap={{ scale: 0.98 }}
-                disabled={loading}
-                style={{
-                  background: C.buttonBg, // Dark Navy Blue
-                  color: "#ffffff", 
-                  border: "none", 
-                  padding: "12px 32px", // Smaller padding
-                  borderRadius: "8px", 
-                  fontSize: "15px", // Slightly smaller font
-                  fontWeight: 600, 
-                  cursor: loading ? "not-allowed" : "pointer",
-                  width: "100%",
-                  maxWidth: "220px", // Compact button size
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  boxShadow: "0 4px 14px rgba(28, 69, 108, 0.2)",
-                  transition: "box-shadow 0.2s"
-                }}
+            {/* --- 6. SUBMIT BUTTON --- */}
+            <div className="mt-10 text-center">
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="inline-flex items-center justify-center px-[50px] py-[18px] bg-[#1F486E] hover:bg-[#163654] text-white font-bold rounded-[50px] text-[1.1rem] shadow-[0_10px_25px_rgba(31,72,110,0.25)] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1"
               >
-                {loading ? "Submitting..." : <>Register Investor <span>→</span></>}
-              </motion.button>
+                {isSubmitting ? (
+                  <><span className="inline-block w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin mr-[10px] align-middle"></span> Processing...</>
+                ) : (
+                  <><Send className="w-5 h-5 mr-2" /> Register as Investor</>
+                )}
+              </button>
             </div>
 
           </form>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </main>
   );
-};
-
-export default InvestorRegistration;
-
-/* --- REUSABLE COMPONENTS & STYLES --- */
-
-const inputBaseStyles = {
-  width: "100%", 
-  padding: "14px 16px", 
-  borderRadius: "8px", 
-  border: `1.5px solid ${C.border}`,
-  fontSize: "14px", 
-  outline: "none", 
-  transition: "border 0.2s, box-shadow 0.2s", 
-  boxSizing: "border-box", 
-  backgroundColor: C.white,
-  color: C.primaryText,
-  fontWeight: 500
-};
-
-const Label = ({ text, required, optional }) => (
-  <label style={{ fontSize: "14px", fontWeight: 700, color: C.primaryText }}>
-    {text} 
-    {required && <span style={{ color: C.red }}> *</span>}
-    {optional && <span style={{ color: C.textLight, fontWeight: 500, fontSize: "12px" }}> (Optional)</span>}
-  </label>
-);
-
-const InputField = ({ label, required, optional, disabled, ...props }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-    <Label text={label} required={required} optional={optional} />
-    <input 
-      style={{ 
-        ...inputBaseStyles, 
-        opacity: disabled ? 0.6 : 1, 
-        cursor: disabled ? "not-allowed" : "text" 
-      }} 
-      disabled={disabled} 
-      {...props} 
-      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
-      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
-    />
-  </div>
-);
-
-const SelectField = ({ label, required, optional, options, placeholder, disabled, ...props }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-    <Label text={label} required={required} optional={optional} />
-    <select 
-      style={{ 
-        ...inputBaseStyles, 
-        color: props.value ? C.primaryText : C.textLight, 
-        cursor: disabled ? "not-allowed" : "pointer", 
-        opacity: disabled ? 0.6 : 1 
-      }} 
-      disabled={disabled} 
-      {...props}
-      onFocus={(e) => { e.target.style.border = `1.5px solid ${C.buttonBg}`; e.target.style.boxShadow = `0 0 0 3px rgba(31, 72, 110, 0.1)`; }}
-      onBlur={(e) => { e.target.style.border = `1.5px solid ${C.border}`; e.target.style.boxShadow = "none"; }}
-    >
-      <option value="" disabled>{placeholder}</option>
-      {options && options.map((opt, i) => (
-        <option key={i} value={opt}>{opt}</option>
-      ))}
-    </select>
-  </div>
-);
+}

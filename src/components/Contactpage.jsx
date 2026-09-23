@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useAnimation, animate } from 'framer-motion';
 // ADDED: Import Link from react-router-dom
 import { Link } from 'react-router-dom';
+import API_URL from "./Config"; // Added API Config
 
 // Create a motion-enabled Link component
 const MotionLink = motion(Link);
@@ -189,11 +190,12 @@ const SocialBtn = ({ icon, label, url, color, delay }) => {
 };
 
 /* ─────────────────────────────────────────
-   CONTACT FORM
+   CONTACT FORM WITH INTEGRATED API
 ───────────────────────────────────────── */
 const ContactForm = () => {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', bot_field: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [focused, setFocused] = useState(null);
 
   const fieldStyle = (field) => ({
@@ -210,9 +212,42 @@ const ContactForm = () => {
     display: 'block', marginBottom: 8, transition: 'color 0.3s',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (form.bot_field !== '') return; // Honeypot trap
+
+    setIsSubmitting(true);
+
+    // Extract Incubation ID securely from env variables or fallback
+    const incubationId = import.meta.env.VITE_INCUBATION_ID || "6ab39542497aa33526fcd95b";
+    const endpoint = API_URL ? `${API_URL}/contact/submit` : 'https://incubationmasters.com/api/contact/submit';
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          incubationId: incubationId,
+          name: form.name,
+          email: form.email,
+          contactNumber: form.phone,
+          subject: "Website Contact Form Inquiry", // Hardcoded since the UI doesn't have a Subject field
+          message: form.message
+        })
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+      } else {
+        const errData = await response.json();
+        alert(`Failed to send message: ${errData.message || 'Please try again.'}`);
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      alert("Network Error! Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -233,7 +268,7 @@ const ContactForm = () => {
         </p>
         <motion.button
           whileHover={{ y: -3, boxShadow: '0 12px 28px rgba(245, 166, 35, 0.3)' }} whileTap={{ scale: 0.96 }}
-          onClick={() => { setSubmitted(false); setForm({ name: '', email: '', phone: '', message: '' }); }}
+          onClick={() => { setSubmitted(false); setForm({ name: '', email: '', phone: '', message: '', bot_field: '' }); }}
           style={{ padding: '16px 32px', borderRadius: 100, border: 'none', background: C.accent, color: C.dark, fontWeight: 800, fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 8px 20px rgba(245, 166, 35, 0.2)' }}
         >
           Send Another Message
@@ -244,6 +279,10 @@ const ContactForm = () => {
 
   return (
     <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+      
+      {/* Honeypot Input */}
+      <input type="text" name="bot_field" value={form.bot_field} onChange={e => setForm(p => ({ ...p, bot_field: e.target.value }))} style={{ display: 'none' }} />
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginBottom: 20 }}>
         <div>
           <label style={labelStyle('name')}>Your Name *</label>
@@ -259,8 +298,8 @@ const ContactForm = () => {
 
       <div style={{ marginBottom: 20 }}>
         <label style={labelStyle('phone')}>Phone Number</label>
-        <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-          placeholder="9876543210" style={fieldStyle('phone')} onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} />
+        <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value.replace(/[^0-9]/g, '') }))}
+          placeholder="9876543210" style={fieldStyle('phone')} onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} maxLength="15" />
       </div>
 
       <div style={{ marginBottom: 32 }}>
@@ -272,18 +311,23 @@ const ContactForm = () => {
 
       <motion.button
         type="submit"
-        whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(27, 70, 113, 0.35)' }} whileTap={{ scale: 0.97 }}
+        disabled={isSubmitting}
+        whileHover={{ y: isSubmitting ? 0 : -4, boxShadow: isSubmitting ? 'none' : '0 16px 40px rgba(27, 70, 113, 0.35)' }} 
+        whileTap={{ scale: isSubmitting ? 1 : 0.97 }}
         style={{
           width: '100%', padding: '18px 32px', borderRadius: 14, border: 'none',
           background: `linear-gradient(135deg, ${C.primary}, ${C.mid})`, color: C.white, fontWeight: 800, fontSize: 16,
-          fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 8px 24px rgba(27, 70, 113, 0.25)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, transition: 'background 0.3s'
+          fontFamily: 'inherit', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: '0 8px 24px rgba(27, 70, 113, 0.25)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, transition: 'background 0.3s',
+          opacity: isSubmitting ? 0.7 : 1
         }}
       >
-        <span>Send Message</span>
-        <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
-          →
-        </motion.span>
+        <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+        {!isSubmitting && (
+          <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
+            →
+          </motion.span>
+        )}
       </motion.button>
     </form>
   );

@@ -12,15 +12,16 @@ import { Link } from "react-router-dom";
 import logoImage from "../assets/logo.png"; 
 import popupImage from "../assets/registeration.png";
 
-/* ─── Brand colors (Modern Navy Blue & Orange) ─── */
+/* ─── Brand colors (Premium Navy Blue & Golden Yellow) ─── */
 const C = {
   primary: "#15436B", // Deep Navy Blue
-  primaryDk: "#0E2E4A", // Hover dark blue
+  primaryDk: "#0A2236", // Dark Navy
   primaryLt: "#F0F6FB", // Light blue tint for backgrounds
-  accent: "#EA9F24", // Golden Orange
-  accentLight: "#F3C57B", // Light Orange for gradients
-  dark: "#0D1F2D", // Near-black navy
-  text: "#475569", // Modern slate gray for readability
+  accent: "#EA9F24", // Golden Yellow
+  accentDk: "#D68A1B", // Darker Golden Yellow for hovers
+  accentLight: "#F3C57B", // Light Yellow for gradients
+  dark: "#0F172A", // Near-black slate
+  text: "#334155", // Dark slate for strong readability
   muted: "#64748B", // Muted text
   white: "#FFFFFF",
 };
@@ -35,7 +36,7 @@ const navLinks = [
     name: "About Us",
     dropdown: [{ name: "Who We Are", to: "/who-we-are" }],
   },
-  { name: "Events", to: "/GWEDC" },
+  { name: "Events", to: "/news-event" },
   { name: "Services", to: "/Services" },
   {
     name: "Join Gincube",
@@ -78,7 +79,7 @@ const DropdownMenu = ({ items }) => (
       position: "absolute",
       top: "calc(100% + 10px)",
       left: 0,
-      minWidth: "200px",
+      minWidth: "220px",
       background: C.white,
       border: `1px solid ${C.primaryLt}`,
       borderRadius: "14px",
@@ -86,33 +87,33 @@ const DropdownMenu = ({ items }) => (
       overflow: "hidden",
       zIndex: 9999,
       pointerEvents: "auto",
-      padding: "6px",
+      padding: "8px",
     }}
   >
-    {/* Blue to Orange accent top bar */}
+    {/* Blue to Yellow accent top bar */}
     <div
       style={{
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
-        height: "3px",
+        height: "4px",
         background: `linear-gradient(90deg, ${C.primary}, ${C.accent})`,
       }}
     />
-    <div style={{ paddingTop: "4px" }}>
+    <div style={{ paddingTop: "6px" }}>
       {items.map((item, idx) => {
         const itemStyles = {
           display: "flex",
           alignItems: "center",
-          gap: "10px",
-          padding: "10px 14px",
+          gap: "12px",
+          padding: "12px 16px",
           borderRadius: "10px",
-          fontSize: "14px",
+          fontSize: "15px",
           color: C.text,
           textDecoration: "none",
           transition: "background 0.15s, color 0.15s",
-          fontWeight: 500,
+          fontWeight: 600,
         };
 
         const hoverEvents = {
@@ -218,7 +219,7 @@ const PopupModal = ({ onClose }) => {
           background: C.white,
           borderRadius: "20px",
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "420px",
           overflow: "hidden",
           zIndex: 10,
           boxShadow: `0 32px 80px rgba(21, 67, 107, 0.28), 0 8px 24px rgba(0,0,0,0.12)`,
@@ -226,7 +227,7 @@ const PopupModal = ({ onClose }) => {
       >
         <div
           style={{
-            height: "5px",
+            height: "6px",
             background: `linear-gradient(90deg, ${C.primary}, ${C.accent}, ${C.accentLight})`,
           }}
         />
@@ -241,10 +242,10 @@ const PopupModal = ({ onClose }) => {
             position: "absolute",
             top: "14px",
             right: "14px",
-            width: "32px",
-            height: "32px",
+            width: "36px",
+            height: "36px",
             borderRadius: "50%",
-            background: "rgba(255,255,255,0.9)",
+            background: "rgba(255,255,255,0.95)",
             border: `1.5px solid ${C.primaryLt}`,
             display: "flex",
             alignItems: "center",
@@ -254,7 +255,7 @@ const PopupModal = ({ onClose }) => {
             boxShadow: "0 2px 8px rgba(21, 67, 107, 0.15)",
           }}
         >
-          <X size={16} color={C.primary} />
+          <X size={18} color={C.primary} />
         </motion.button>
 
         <motion.div
@@ -263,7 +264,6 @@ const PopupModal = ({ onClose }) => {
           animate="visible"
           style={{ lineHeight: 0, overflow: "hidden" }}
         >
-          {/* UPDATED: using popupImage variable */}
           <motion.img
             src={popupImage} 
             alt="Little CEOs of Gwalior"
@@ -278,12 +278,12 @@ const PopupModal = ({ onClose }) => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          style={{ padding: "20px 22px 24px" }}
+          style={{ padding: "24px 28px 28px" }}
         >
           <motion.div
             variants={itemVariants}
             style={{
-              marginBottom: "14px",
+              marginBottom: "18px",
               display: "flex",
               justifyContent: "center",
             }}
@@ -292,20 +292,20 @@ const PopupModal = ({ onClose }) => {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: "8px",
                 background: C.primaryLt,
                 color: C.primary,
                 borderRadius: "100px",
-                padding: "5px 14px",
-                fontSize: "12px",
-                fontWeight: 600,
+                padding: "6px 16px",
+                fontSize: "13px",
+                fontWeight: 700,
                 letterSpacing: "0.02em",
               }}
             >
               <span
                 style={{
-                  width: "7px",
-                  height: "7px",
+                  width: "8px",
+                  height: "8px",
                   borderRadius: "50%",
                   background: C.accent,
                   animation: "pulse-dot 1.5s infinite",
@@ -327,28 +327,29 @@ const PopupModal = ({ onClose }) => {
               alignItems: "center",
               justifyContent: "center",
               gap: "8px",
-              background: `linear-gradient(135deg, ${C.primary}, #1C5A8F)`,
+              background: `linear-gradient(135deg, ${C.accent}, ${C.accentDk})`, // Golden Yellow Button
               color: "#fff",
-              fontWeight: 700,
-              fontSize: "15px",
+              fontWeight: 800,
+              fontSize: "16px",
               borderRadius: "12px",
-              padding: "14px",
+              padding: "16px",
               textDecoration: "none",
-              boxShadow: `0 8px 24px rgba(21, 67, 107, 0.35)`,
+              boxShadow: `0 8px 24px rgba(234, 159, 36, 0.35)`,
               letterSpacing: "0.01em",
             }}
           >
-            <Sparkles size={16} />
+            <Sparkles size={18} />
             Register for Little CEOs
-            <ExternalLink size={14} />
+            <ExternalLink size={16} />
           </motion.a>
 
           <p
             style={{
-              margin: "10px 0 0",
+              margin: "14px 0 0",
               textAlign: "center",
-              fontSize: "11px",
+              fontSize: "12px",
               color: C.muted,
+              fontWeight: 500
             }}
           >
             www.gincube.org
@@ -397,11 +398,11 @@ const Navbar = () => {
   const linkStyles = {
     display: "inline-flex",
     alignItems: "center",
-    gap: "4px",
-    padding: "8px 14px",
+    gap: "6px",
+    padding: "10px 16px",
     borderRadius: "10px",
-    fontSize: "14.5px",
-    fontWeight: 500,
+    fontSize: "16px", // Increased Text Size
+    fontWeight: 600, // Stronger weight
     color: C.text,
     textDecoration: "none",
     transition: "background 0.15s, color 0.15s",
@@ -449,7 +450,7 @@ const Navbar = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              height: "72px",
+              height: "80px", // Increased height to accommodate larger logo
             }}
           >
             <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
@@ -459,18 +460,17 @@ const Navbar = () => {
                 style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
                 aria-label="Go to Home"
               >
-                {/* UPDATED: using logoImage variable */}
                 <img
                   src={logoImage} 
                   alt="Gincube"
-                  style={{ height: "40px", width: "auto" }}
+                  style={{ height: "52px", width: "auto" }} // Increased Logo Size
                 />
               </motion.div>
             </Link>
 
             {/* Desktop nav */}
             <div
-              style={{ display: "none", alignItems: "center", gap: "4px" }}
+              style={{ display: "none", alignItems: "center", gap: "6px" }}
               className="desktop-nav"
             >
               {navLinks.map((link, i) => (
@@ -488,10 +488,10 @@ const Navbar = () => {
                         background: "none",
                         border: "none",
                         cursor: "pointer",
-                        padding: "8px 14px",
+                        padding: "10px 16px",
                         borderRadius: "10px",
-                        fontSize: "14.5px",
-                        fontWeight: 500,
+                        fontSize: "16px",
+                        fontWeight: 600,
                         color: C.text,
                         transition: "background 0.15s, color 0.15s",
                       }}
@@ -521,7 +521,7 @@ const Navbar = () => {
                           transition={{ duration: 0.22 }}
                           style={{ display: "inline-flex", color: C.muted }}
                         >
-                          <ChevronDown size={14} />
+                          <ChevronDown size={16} />
                         </motion.span>
                       )}
                     </a>
@@ -546,23 +546,23 @@ const Navbar = () => {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setIsPopupOpen(true)}
                 style={{
-                  marginLeft: "8px",
+                  marginLeft: "12px",
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
-                  background: `linear-gradient(135deg, ${C.primary}, #1C5A8F)`,
+                  gap: "8px",
+                  background: `linear-gradient(135deg, ${C.accent}, ${C.accentDk})`, // Golden Yellow Button
                   color: "#fff",
                   border: "none",
                   cursor: "pointer",
-                  padding: "9px 18px",
+                  padding: "10px 22px",
                   borderRadius: "100px",
-                  fontSize: "13.5px",
-                  fontWeight: 700,
-                  boxShadow: `0 4px 16px rgba(21, 67, 107, 0.3)`,
+                  fontSize: "15px",
+                  fontWeight: 800,
+                  boxShadow: `0 4px 16px rgba(234, 159, 36, 0.35)`,
                   transition: "box-shadow 0.2s",
                 }}
               >
-                <Sparkles size={14} />
+                <Sparkles size={16} />
                 Register
               </motion.button>
             </div>
@@ -575,8 +575,8 @@ const Navbar = () => {
               aria-label="Toggle menu"
               style={{
                 background: "none",
-                border: `1.5px solid ${C.primaryLt}`,
-                borderRadius: "10px",
+                border: `2px solid ${C.primaryLt}`,
+                borderRadius: "12px",
                 padding: "8px",
                 cursor: "pointer",
                 color: C.primary,
@@ -593,7 +593,7 @@ const Navbar = () => {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.18 }}
                   >
-                    <X size={22} />
+                    <X size={26} />
                   </motion.span>
                 ) : (
                   <motion.span
@@ -603,7 +603,7 @@ const Navbar = () => {
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.18 }}
                   >
-                    <Menu size={22} />
+                    <Menu size={26} />
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -625,7 +625,7 @@ const Navbar = () => {
                 overflow: "hidden",
               }}
             >
-              <div style={{ padding: "12px 16px 24px" }}>
+              <div style={{ padding: "16px 20px 32px" }}>
                 {navLinks.map((link, i) => (
                   <div key={i}>
                     {link.isPopupTrigger ? (
@@ -639,10 +639,10 @@ const Navbar = () => {
                           textAlign: "left",
                           background: "none",
                           border: "none",
-                          padding: "13px 16px",
+                          padding: "16px",
                           borderRadius: "12px",
-                          fontSize: "15px",
-                          fontWeight: 500,
+                          fontSize: "18px", // Larger Text Mobile
+                          fontWeight: 600,
                           color: C.text,
                           cursor: "pointer",
                         }}
@@ -659,10 +659,10 @@ const Navbar = () => {
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "center",
-                              padding: "13px 16px",
+                              padding: "16px",
                               borderRadius: "12px",
-                              fontSize: "15px",
-                              fontWeight: 500,
+                              fontSize: "18px", // Larger Text Mobile
+                              fontWeight: 600,
                               color: C.text,
                               textDecoration: "none",
                             }}
@@ -677,34 +677,34 @@ const Navbar = () => {
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "center",
-                              padding: "13px 16px",
+                              padding: "16px",
                               borderRadius: "12px",
-                              fontSize: "15px",
-                              fontWeight: 500,
+                              fontSize: "18px", // Larger Text Mobile
+                              fontWeight: 600,
                               color: C.text,
                               textDecoration: "none",
                             }}
                           >
                             {link.name}
                             {link.dropdown && (
-                              <ChevronDown size={15} color={C.muted} />
+                              <ChevronDown size={18} color={C.muted} />
                             )}
                           </a>
                         )}
 
                         {link.dropdown && (
                           <div
-                            style={{ paddingLeft: "20px", marginBottom: "4px" }}
+                            style={{ paddingLeft: "24px", marginBottom: "8px" }}
                           >
                             {link.dropdown.map((item, idx) => {
                               const dropdownItemStyle = {
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "8px",
-                                padding: "10px 14px",
+                                gap: "10px",
+                                padding: "12px 16px",
                                 borderRadius: "10px",
-                                fontSize: "13.5px",
-                                fontWeight: 500,
+                                fontSize: "15px",
+                                fontWeight: 600,
                                 color: C.muted,
                                 textDecoration: "none",
                               };
@@ -712,8 +712,8 @@ const Navbar = () => {
                               const dot = (
                                 <span
                                   style={{
-                                    width: "5px",
-                                    height: "5px",
+                                    width: "6px",
+                                    height: "6px",
                                     borderRadius: "50%",
                                     background: C.accent,
                                   }}
@@ -754,7 +754,7 @@ const Navbar = () => {
                 ))}
 
                 {/* Mobile register CTA */}
-                <div style={{ marginTop: "12px", padding: "0 4px" }}>
+                <div style={{ marginTop: "16px", padding: "0 8px" }}>
                   <a
                     href={FORM_URL}
                     target="_blank"
@@ -763,20 +763,20 @@ const Navbar = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "8px",
-                      background: `linear-gradient(135deg, ${C.primary}, #1C5A8F)`,
+                      gap: "10px",
+                      background: `linear-gradient(135deg, ${C.accent}, ${C.accentDk})`, // Golden Yellow Button
                       color: "#fff",
                       textDecoration: "none",
-                      borderRadius: "12px",
-                      padding: "14px",
-                      fontSize: "15px",
-                      fontWeight: 700,
-                      boxShadow: `0 6px 20px rgba(21, 67, 107, 0.3)`,
+                      borderRadius: "14px",
+                      padding: "16px",
+                      fontSize: "16px",
+                      fontWeight: 800,
+                      boxShadow: `0 8px 24px rgba(234, 159, 36, 0.35)`,
                     }}
                   >
-                    <Sparkles size={16} />
+                    <Sparkles size={18} />
                     Register for Little CEOs
-                    <ExternalLink size={14} />
+                    <ExternalLink size={16} />
                   </a>
                 </div>
               </div>

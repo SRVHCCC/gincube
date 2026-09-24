@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
 import { User, Mail, Phone, Lock, Building, MapPin, Target, Send, Globe } from 'lucide-react';
 
@@ -123,41 +123,44 @@ export default function StartupRegistration() {
         }
     };
 
-    // UI HELPER CLASSES (Rise Layout + Professional Blue/Navy Colors)
-    const inputStyle = "w-full px-[16px] py-[12px] rounded-[10px] border-2 border-[#CBD5E1] focus:border-[#1F486E] focus:ring-2 focus:ring-[#1F486E]/10 outline-none transition-all text-[#0D1F2D] bg-[#F8FAFC] focus:bg-white text-[0.95rem] font-medium";
-    const labelStyle = "flex items-center text-[0.95rem] font-bold text-[#0D1F2D] mb-2";
-    const sectionHeadingStyle = "text-[1.3rem] font-bold text-[#0D1F2D] mb-6 flex items-center border-b border-[#CBD5E1]/50 pb-3";
+    // UI HELPER CLASSES (Navy Blue & Yellow Theme)
+    const inputStyle = "w-full px-[16px] py-[14px] rounded-[12px] border-2 border-[#E2E8F0] focus:border-[#EA9F24] focus:ring-4 focus:ring-[#EA9F24]/15 outline-none transition-all text-[#0A2236] bg-[#F8FAFC] focus:bg-white text-[0.95rem] font-medium";
+    const labelStyle = "flex items-center text-[0.95rem] font-bold text-[#0A2236] mb-2";
+    const sectionHeadingStyle = "text-[1.4rem] font-extrabold text-[#0A2236] mb-6 flex items-center border-b-2 border-[#F0F6FB] pb-3";
 
     return (
         <main className="min-h-screen bg-[#F8FAFC] font-['Inter',sans-serif] pb-24">
             
-            {/* ================= TOP BANNER (Dark Navy Theme) ================= */}
-            <div className="w-full bg-[#0D1F2D] py-24 relative overflow-hidden shadow-inner">
-                <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[60%] rounded-full bg-[#287BBE]/20 blur-[120px]"></div>
-                <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#1F486E]/40 blur-[100px]"></div>
+            {/* ================= TOP BANNER (Dark Navy Theme with Yellow Glow) ================= */}
+            <div className="w-full bg-gradient-to-br from-[#0A2236] via-[#15436B] to-[#1C5A8F] py-24 relative overflow-hidden shadow-inner">
+                <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[60%] rounded-full bg-[#EA9F24]/20 blur-[120px] animate-pulse"></div>
+                <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#287BBE]/30 blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
                 
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10">
-                    <div className="inline-block px-[16px] py-[6px] rounded-full bg-[#287BBE]/10 border border-[#287BBE]/30 text-[#287BBE] font-semibold text-sm mb-6 backdrop-blur-sm shadow-sm">
+                    <div className="inline-block px-[18px] py-[8px] rounded-full bg-[#EA9F24]/10 border border-[#EA9F24]/30 text-[#EA9F24] font-bold text-sm mb-6 backdrop-blur-sm shadow-sm">
                         Join G.Incube Ecosystem
                     </div>
-                    <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4rem] font-extrabold text-white tracking-tight mb-6 leading-tight">
-                        Startup <span className="text-[#287BBE]">Registration</span>
+                    <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4.5rem] font-extrabold text-white tracking-tight mb-6 leading-tight">
+                        Startup <span className="text-[#EA9F24]">Registration</span>
                     </h1>
-                    <p className="text-[#CBD5E1] text-[1.1rem] font-medium max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-[#D0E2F2] text-[1.15rem] font-medium max-w-2xl mx-auto leading-relaxed">
                         Turn your vision into reality! Get access to mentorship, funding, and a thriving startup ecosystem.
                     </p>
                 </div>
             </div>
 
             {/* ================= FORM CONTAINER ================= */}
-            <div className="max-w-[1000px] mx-auto px-4 md:px-6 -mt-10 relative z-20">
-                <div className="bg-white shadow-[0_15px_40px_rgba(31,72,110,0.08)] rounded-[20px] p-[30px] md:p-[50px] border border-[#CBD5E1]/50 border-t-[5px] border-t-[#1F486E]">
+            <div className="max-w-[1000px] mx-auto px-4 md:px-6 -mt-12 relative z-20">
+                <div className="bg-white shadow-[0_20px_60px_rgba(21,67,107,0.08)] rounded-[24px] p-[30px] md:p-[50px] border border-[#E2E8F0] border-t-[6px] border-t-[#EA9F24]">
                     <form onSubmit={handleSubmit}>
                         
                         {/* --- 1. FOUNDER DETAILS --- */}
-                        <div className="mb-10">
+                        <div className="mb-12">
                             <h3 className={sectionHeadingStyle}>
-                                <User className="w-5 h-5 mr-2 text-[#1F486E]" /> Founder Details
+                                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                                    <User className="w-5 h-5 text-[#EA9F24]" />
+                                </div>
+                                Founder Details
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -169,24 +172,27 @@ export default function StartupRegistration() {
                                     <input type="text" required className={inputStyle} placeholder="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} />
                                 </div>
                                 <div>
-                                    <label className={labelStyle}><Mail className="w-4 h-4 mr-1.5 text-[#1F486E]" /> Email Address <span className="text-[#EF4444] ml-1">*</span></label>
+                                    <label className={labelStyle}><Mail className="w-4 h-4 mr-1.5 text-[#15436B]" /> Email Address <span className="text-[#EF4444] ml-1">*</span></label>
                                     <input type="email" required className={inputStyle} placeholder="Founder Email" name="email" value={formData.email} onChange={handleChange} />
                                 </div>
                                 <div>
-                                    <label className={labelStyle}><Phone className="w-4 h-4 mr-1.5 text-[#1F486E]" /> Mobile Number <span className="text-[#EF4444] ml-1">*</span></label>
+                                    <label className={labelStyle}><Phone className="w-4 h-4 mr-1.5 text-[#15436B]" /> Mobile Number <span className="text-[#EF4444] ml-1">*</span></label>
                                     <input type="tel" required className={inputStyle} placeholder="10-digit Mobile" name="mobile" value={formData.mobile} onChange={handleChange} maxLength="15" />
                                 </div>
-                                <div>
-                                    <label className={labelStyle}><Lock className="w-4 h-4 mr-1.5 text-[#1F486E]" /> Password <span className="text-[#EF4444] ml-1">*</span></label>
+                                <div className="md:col-span-2">
+                                    <label className={labelStyle}><Lock className="w-4 h-4 mr-1.5 text-[#15436B]" /> Password <span className="text-[#EF4444] ml-1">*</span></label>
                                     <input type="password" required className={inputStyle} placeholder="Create a strong password" name="password" value={formData.password} onChange={handleChange} />
                                 </div>
                             </div>
                         </div>
 
                         {/* --- 2. STARTUP DETAILS --- */}
-                        <div className="mb-10">
+                        <div className="mb-12">
                             <h3 className={sectionHeadingStyle}>
-                                <Building className="w-5 h-5 mr-2 text-[#1F486E]" /> Startup Profile
+                                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                                    <Building className="w-5 h-5 text-[#EA9F24]" />
+                                </div>
+                                Startup Profile
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -194,7 +200,7 @@ export default function StartupRegistration() {
                                     <input type="text" required className={inputStyle} placeholder="Your Startup Name" name="startupName" value={formData.startupName} onChange={handleChange} />
                                 </div>
                                 <div>
-                                    <label className={labelStyle}><Globe className="w-4 h-4 mr-1.5 text-[#1F486E]" /> Website URL <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                                    <label className={labelStyle}><Globe className="w-4 h-4 mr-1.5 text-[#15436B]" /> Website URL <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
                                     <input type="url" className={inputStyle} placeholder="https://yourstartup.com" name="website" value={formData.website} onChange={handleChange} />
                                 </div>
                                 <div>
@@ -237,9 +243,12 @@ export default function StartupRegistration() {
                         </div>
 
                         {/* --- 3. LOCATION --- */}
-                        <div className="mb-10">
+                        <div className="mb-12">
                             <h3 className={sectionHeadingStyle}>
-                                <MapPin className="w-5 h-5 mr-2 text-[#1F486E]" /> Location Details
+                                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                                    <MapPin className="w-5 h-5 text-[#EA9F24]" />
+                                </div>
+                                Location Details
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
@@ -283,7 +292,10 @@ export default function StartupRegistration() {
                         {/* --- 4. BUSINESS PROPOSAL --- */}
                         <div className="mb-10">
                             <h3 className={sectionHeadingStyle}>
-                                <Target className="w-5 h-5 mr-2 text-[#1F486E]" /> Business Proposal
+                                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                                    <Target className="w-5 h-5 text-[#EA9F24]" />
+                                </div>
+                                Business Proposal
                             </h3>
                             <div className="grid grid-cols-1 gap-6">
                                 <div>
@@ -298,9 +310,9 @@ export default function StartupRegistration() {
                         </div>
 
                         {/* --- 5. GOOGLE RECAPTCHA (OPTIONAL) --- */}
-                        <div className="mt-8 bg-[#F8FAFC] p-6 rounded-[12px] border border-[#CBD5E1]/50 flex flex-col items-center">
-                            <label className="text-[0.85rem] font-bold text-[#64748B] uppercase tracking-wider mb-4">
-                                Security Verification <span className="font-normal normal-case">(Optional)</span>
+                        <div className="mt-8 bg-[#F0F6FB] p-6 rounded-[16px] border border-[#E2E8F0] flex flex-col items-center">
+                            <label className="text-[0.85rem] font-bold text-[#15436B] uppercase tracking-wider mb-4">
+                                Security Verification <span className="font-medium normal-case text-[#64748B]">(Optional)</span>
                             </label>
                             
                             <ReCAPTCHA
@@ -315,10 +327,10 @@ export default function StartupRegistration() {
                             <button 
                                 type="submit" 
                                 disabled={isSubmitting}
-                                className="inline-flex items-center justify-center px-[50px] py-[18px] bg-[#1F486E] hover:bg-[#163654] text-white font-bold rounded-[50px] text-[1.1rem] shadow-[0_10px_25px_rgba(31,72,110,0.25)] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1"
+                                className="inline-flex items-center justify-center px-[50px] py-[20px] bg-gradient-to-r from-[#EA9F24] to-[#D68A1B] hover:from-[#D68A1B] hover:to-[#B47012] text-white font-extrabold rounded-[50px] text-[1.1rem] shadow-[0_10px_30px_rgba(234,159,36,0.35)] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1 w-full md:w-auto"
                             >
                                 {isSubmitting ? (
-                                    <><span className="inline-block w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin mr-[10px] align-middle"></span> Processing...</>
+                                    <><span className="inline-block w-[20px] h-[20px] border-2 border-white/30 border-t-white rounded-full animate-spin mr-[10px] align-middle"></span> Processing...</>
                                 ) : (
                                     <><Send className="w-5 h-5 mr-2" /> Submit Registration</>
                                 )}

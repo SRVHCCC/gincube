@@ -3,10 +3,28 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { User, Mail, Phone, MapPin, Send, Building, Globe, FileText, Image as ImageIcon, Briefcase } from 'lucide-react';
 import ReCAPTCHA from "react-google-recaptcha";
-import API_URL from "../components/config"; // Load API URL from Config
+import API_URL from "../components/Config"; // Load API URL from Config
 import locationData from '../data/locationData.json'; // Load local JSON data
 
 gsap.registerPlugin(ScrollTrigger);
+
+/* ─────────────────────────────────────────
+   BRAND TOKENS (Premium Navy Blue & Golden Yellow Theme)
+───────────────────────────────────────── */
+const C = {
+  primary:    '#15436B', // Deep Navy Blue
+  mid:        '#1C5A8F', // Mid Blue
+  light:      '#287BBE', // Lighter Blue
+  pale:       '#E2E8F0', // Pale Slate for borders
+  lt:         '#F8FAFC', // Lightest slate for bg
+  dark:       '#0A2236', // Darkest Navy
+  heading:    '#0A2236', // Crisp slate for headings
+  text:       '#334155', // Modern slate gray
+  muted:      '#64748B', // Muted text
+  accent:     '#EA9F24', // Golden Yellow
+  accentDk:   '#D68A1B', // Dark Yellow
+  white:      '#FFFFFF',
+};
 
 export default function InvestorRegistration() {
   const pageRef = useRef(null);
@@ -153,7 +171,7 @@ export default function InvestorRegistration() {
       nodePayload.append('stage', JSON.stringify(selectedStages));
       nodePayload.append('industry', JSON.stringify(selectedIndustries));
 
-      // --- 2. Payload for RiseJhansi Legacy API ---
+      // --- 2. Payload for Legacy API ---
       const risePayload = new FormData();
       risePayload.append('company_name', formData.companyName || 'Individual');
       risePayload.append('investor_name', formData.investorName);
@@ -166,17 +184,15 @@ export default function InvestorRegistration() {
       risePayload.append('investment_limit', formData.investmentLimit);
       risePayload.append('investor_type', formData.investorType);
       
-      // Dynamic Checkbox mapping for RiseJhansi API
       if (selectedStages.includes('Ideation')) risePayload.append('stage_ideation', 1);
       if (selectedStages.includes('Validation')) risePayload.append('stage_validation', 1);
       
-      risePayload.append('code_again', 'BYPASS'); // RiseJhansi Legacy Bypass
-      risePayload.append('captcha', captchaToken || ''); // Optional Captcha
+      risePayload.append('code_again', 'BYPASS'); 
+      risePayload.append('captcha', captchaToken || ''); 
 
       try {
-        // Run both API calls concurrently using fetch
         const [nodeRes, riseRes] = await Promise.allSettled([
-          fetch(nodeEndpoint, { method: 'POST', body: nodePayload }), // FormData sets boundaries automatically
+          fetch(nodeEndpoint, { method: 'POST', body: nodePayload }),
           fetch('https://risejhansi.in/InvestorController/saveInvestor', { method: 'POST', body: risePayload })
         ]);
 
@@ -200,45 +216,48 @@ export default function InvestorRegistration() {
     }
   };
 
-  // UI HELPER CLASSES (Professional Blue/Navy Theme)
-  const inputStyle = "w-full px-[16px] py-[12px] rounded-[10px] border-2 border-[#CBD5E1] focus:border-[#1F486E] focus:ring-2 focus:ring-[#1F486E]/10 outline-none transition-all text-[#0D1F2D] bg-[#F8FAFC] focus:bg-white text-[0.95rem] font-medium";
-  const labelStyle = "flex items-center text-[0.95rem] font-bold text-[#0D1F2D] mb-2";
-  const sectionHeadingStyle = "text-[1.3rem] font-bold text-[#0D1F2D] mb-6 flex items-center border-b border-[#CBD5E1]/50 pb-3";
+  // UI HELPER CLASSES (Navy Blue & Yellow Theme)
+  const inputStyle = "w-full px-[16px] py-[14px] rounded-[12px] border-2 border-[#E2E8F0] focus:border-[#EA9F24] focus:ring-4 focus:ring-[#EA9F24]/15 outline-none transition-all text-[#0A2236] bg-[#F8FAFC] focus:bg-white text-[0.95rem] font-medium";
+  const labelStyle = "flex items-center text-[0.95rem] font-bold text-[#0A2236] mb-2";
+  const sectionHeadingStyle = "text-[1.4rem] font-extrabold text-[#0A2236] mb-6 flex items-center border-b-2 border-[#F0F6FB] pb-3";
   const errorStyle = "text-[#EF4444] text-[0.8rem] mt-1.5 font-medium";
 
   return (
     <main ref={pageRef} className="flex-grow bg-[#F8FAFC] min-h-screen pt-20 pb-24 font-['Inter',sans-serif]">
       
-      {/* ================= TOP BANNER (Dark Navy Theme) ================= */}
-      <div className="w-full bg-[#0D1F2D] py-24 relative overflow-hidden shadow-inner">
-        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[60%] rounded-full bg-[#287BBE]/20 blur-[120px]"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#1F486E]/40 blur-[100px]"></div>
+      {/* ================= TOP BANNER (Dark Navy Theme with Yellow Glow) ================= */}
+      <div className="w-full bg-gradient-to-br from-[#0A2236] via-[#15436B] to-[#1C5A8F] py-24 relative overflow-hidden shadow-inner">
+        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[60%] rounded-full bg-[#EA9F24]/20 blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-[#287BBE]/30 blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
         
         <div ref={bannerTextRef} className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10">
-          <div className="inline-block px-[16px] py-[6px] rounded-full bg-[#287BBE]/10 border border-[#287BBE]/30 text-[#287BBE] font-semibold text-sm mb-6 backdrop-blur-sm shadow-sm">
-            Catalyst For Change
+          <div className="inline-block px-[18px] py-[8px] rounded-full bg-[#EA9F24]/10 border border-[#EA9F24]/30 text-[#EA9F24] font-bold text-sm mb-6 backdrop-blur-sm shadow-sm">
+            Fund The Future
           </div>
-          <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4rem] font-extrabold text-white tracking-tight mb-6 leading-tight">
-            Investor <span className="text-[#287BBE]">Registration</span>
+          <h1 className="text-[2.5rem] md:text-[3.5rem] lg:text-[4.5rem] font-extrabold text-white tracking-tight mb-6 leading-tight">
+            Investor <span className="text-[#EA9F24]">Registration</span>
           </h1>
-          <p className="text-[#CBD5E1] text-[1.1rem] font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#D0E2F2] text-[1.15rem] font-medium max-w-2xl mx-auto leading-relaxed">
             Discover high-potential startups and innovative ideas! Invest in the future with the G.Incube ecosystem.
           </p>
         </div>
       </div>
 
       {/* ================= FORM CONTAINER ================= */}
-      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
-        <div ref={formRef} className="bg-white p-[30px] md:p-[50px] rounded-[20px] shadow-[0_15px_40px_rgba(31,72,110,0.08)] border border-[#CBD5E1]/50 border-t-[5px] border-t-[#1F486E]">
+      <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20">
+        <div ref={formRef} className="bg-white shadow-[0_20px_60px_rgba(21,67,107,0.08)] rounded-[24px] p-[30px] md:p-[50px] border border-[#E2E8F0] border-t-[6px] border-t-[#EA9F24]">
           <form onSubmit={handleSubmit} noValidate>
             
             {/* Honeypot */}
             <input type="text" name="bot_field" value={formData.bot_field} onChange={handleChange} className="hidden" />
 
             {/* --- 1. FIRM & CONTACT DETAILS --- */}
-            <div className="mb-10">
+            <div className="mb-12">
               <h3 className={sectionHeadingStyle}>
-                <User className="w-5 h-5 mr-2 text-[#1F486E]" /> Investor Profile
+                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                  <User className="w-5 h-5 text-[#EA9F24]" />
+                </div>
+                Investor Profile
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -247,39 +266,42 @@ export default function InvestorRegistration() {
                 </div>
                 <div>
                   <label className={labelStyle}>Investor Name (Contact Person) <span className="text-[#EF4444] ml-1">*</span></label>
-                  <input type="text" name="investorName" className={`${inputStyle} ${errors.investorName ? 'border-[#EF4444]' : ''}`} value={formData.investorName} onChange={handleChange} placeholder="Full Name" />
+                  <input type="text" name="investorName" className={`${inputStyle} ${errors.investorName ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.investorName} onChange={handleChange} placeholder="Full Name" />
                   {errors.investorName && <p className={errorStyle}>{errors.investorName}</p>}
                 </div>
                 <div>
-                  <label className={labelStyle}><Mail className="w-4 h-4 mr-1 text-[#1F486E]"/> Email <span className="text-[#EF4444] ml-1">*</span></label>
-                  <input type="email" name="email" className={`${inputStyle} ${errors.email ? 'border-[#EF4444]' : ''}`} value={formData.email} onChange={handleChange} placeholder="Email address" />
+                  <label className={labelStyle}><Mail className="w-4 h-4 mr-1.5 text-[#15436B]"/> Email <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="email" name="email" className={`${inputStyle} ${errors.email ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.email} onChange={handleChange} placeholder="Email address" />
                   {errors.email && <p className={errorStyle}>{errors.email}</p>}
                 </div>
                 <div>
-                  <label className={labelStyle}><Phone className="w-4 h-4 mr-1 text-[#1F486E]"/> Mobile <span className="text-[#EF4444] ml-1">*</span></label>
-                  <input type="tel" name="mobile" className={`${inputStyle} ${errors.mobile ? 'border-[#EF4444]' : ''}`} value={formData.mobile} onChange={handleChange} placeholder="10-digit number" maxLength="15" />
+                  <label className={labelStyle}><Phone className="w-4 h-4 mr-1.5 text-[#15436B]"/> Mobile <span className="text-[#EF4444] ml-1">*</span></label>
+                  <input type="tel" name="mobile" className={`${inputStyle} ${errors.mobile ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.mobile} onChange={handleChange} placeholder="10-digit number" maxLength="15" />
                   {errors.mobile && <p className={errorStyle}>{errors.mobile}</p>}
                 </div>
                 <div>
-                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1 text-[#1F486E]" /> Website <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1.5 text-[#15436B]" /> Website <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
                   <input type="url" name="website" className={inputStyle} value={formData.website} onChange={handleChange} placeholder="https://..." />
                 </div>
                 <div>
-                  <label className={labelStyle}><ImageIcon className="w-4 h-4 mr-1 text-[#1F486E]" /> Firm Logo <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
-                  <input type="file" accept="image/*" className={`${inputStyle} bg-white`} onChange={handleFileChange} />
+                  <label className={labelStyle}><ImageIcon className="w-4 h-4 mr-1.5 text-[#15436B]" /> Firm Logo <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <input type="file" accept="image/*" className={`${inputStyle} bg-white py-[11px]`} onChange={handleFileChange} />
                 </div>
               </div>
             </div>
 
             {/* --- 2. INVESTMENT PREFERENCES --- */}
-            <div className="mb-10">
+            <div className="mb-12">
               <h3 className={sectionHeadingStyle}>
-                <Briefcase className="w-5 h-5 mr-2 text-[#1F486E]" /> Investment Preferences
+                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                  <Briefcase className="w-5 h-5 text-[#EA9F24]" />
+                </div>
+                Investment Preferences
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                   <label className={labelStyle}>Type Of Investor <span className="text-[#EF4444] ml-1">*</span></label>
-                  <select name="investorType" className={`${inputStyle} ${errors.investorType ? 'border-[#EF4444]' : ''}`} value={formData.investorType} onChange={handleChange}>
+                  <select name="investorType" className={`${inputStyle} ${errors.investorType ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.investorType} onChange={handleChange}>
                     <option value="" disabled>Select investor type</option>
                     <option value="Angel Investor">Angel Investor</option>
                     <option value="Venture Capitalist (VC)">Venture Capitalist (VC)</option>
@@ -306,7 +328,7 @@ export default function InvestorRegistration() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1 text-[#1F486E]" /> LinkedIn URL <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
+                  <label className={labelStyle}><Globe className="w-4 h-4 mr-1.5 text-[#15436B]" /> LinkedIn URL <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
                   <input type="url" name="linkedinProfile" className={inputStyle} value={formData.linkedinProfile} onChange={handleChange} placeholder="https://linkedin.com/in/..." />
                 </div>
               </div>
@@ -314,23 +336,23 @@ export default function InvestorRegistration() {
               {/* Checkboxes for Stage and Industry */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <label className="block text-[0.95rem] font-bold text-[#0D1F2D] mb-3">Choice of startup stage <span className="text-[#EF4444]">*</span></label>
+                  <label className="block text-[0.95rem] font-bold text-[#0A2236] mb-3">Choice of startup stage <span className="text-[#EF4444]">*</span></label>
                   <div className="flex flex-col gap-3">
                     {availableStages.map((stage, i) => (
-                      <label key={i} className="flex items-center space-x-3 cursor-pointer">
-                        <input type="checkbox" className="w-4 h-4 accent-[#1F486E] cursor-pointer" checked={selectedStages.includes(stage)} onChange={() => toggleArrayItem(stage, selectedStages, setSelectedStages)} />
-                        <span className="text-[0.9rem] font-medium text-[#0D1F2D]">{stage}</span>
+                      <label key={i} className={`flex items-center space-x-3 cursor-pointer p-3 rounded-[12px] border-2 transition-colors ${selectedStages.includes(stage) ? 'border-[#EA9F24] bg-[#EA9F24]/5' : 'bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#EA9F24]/50 hover:bg-white'}`}>
+                        <input type="checkbox" className="w-4 h-4 accent-[#EA9F24] cursor-pointer" checked={selectedStages.includes(stage)} onChange={() => toggleArrayItem(stage, selectedStages, setSelectedStages)} />
+                        <span className="text-[0.95rem] font-bold text-[#0A2236]">{stage}</span>
                       </label>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[0.95rem] font-bold text-[#0D1F2D] mb-3">Preferred Industries <span className="text-[#EF4444]">*</span></label>
+                  <label className="block text-[0.95rem] font-bold text-[#0A2236] mb-3">Preferred Industries <span className="text-[#EF4444]">*</span></label>
                   <div className="flex flex-col gap-3">
                     {availableIndustries.map((industry, i) => (
-                      <label key={i} className="flex items-center space-x-3 cursor-pointer">
-                        <input type="checkbox" className="w-4 h-4 accent-[#1F486E] cursor-pointer" checked={selectedIndustries.includes(industry)} onChange={() => toggleArrayItem(industry, selectedIndustries, setSelectedIndustries)} />
-                        <span className="text-[0.9rem] font-medium text-[#0D1F2D]">{industry}</span>
+                      <label key={i} className={`flex items-center space-x-3 cursor-pointer p-3 rounded-[12px] border-2 transition-colors ${selectedIndustries.includes(industry) ? 'border-[#EA9F24] bg-[#EA9F24]/5' : 'bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#EA9F24]/50 hover:bg-white'}`}>
+                        <input type="checkbox" className="w-4 h-4 accent-[#EA9F24] cursor-pointer" checked={selectedIndustries.includes(industry)} onChange={() => toggleArrayItem(industry, selectedIndustries, setSelectedIndustries)} />
+                        <span className="text-[0.95rem] font-bold text-[#0A2236]">{industry}</span>
                       </label>
                     ))}
                   </div>
@@ -339,37 +361,43 @@ export default function InvestorRegistration() {
             </div>
 
             {/* --- 3. LOCATION --- */}
-            <div className="mb-10">
+            <div className="mb-12">
               <h3 className={sectionHeadingStyle}>
-                <MapPin className="w-5 h-5 mr-2 text-[#1F486E]" /> Location
+                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                  <MapPin className="w-5 h-5 text-[#EA9F24]" />
+                </div>
+                Location Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <select name="country" className={`${inputStyle} ${errors.country ? 'border-[#EF4444]' : ''}`} value={formData.country} onChange={handleCountryChange}>
+                  <label className={labelStyle}>Country <span className="text-[#EF4444] ml-1">*</span></label>
+                  <select name="country" className={`${inputStyle} ${errors.country ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.country} onChange={handleCountryChange}>
                     <option value="" disabled>Select Country</option>
                     {countriesList.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
                   </select>
                   {errors.country && <p className={errorStyle}>{errors.country}</p>}
                 </div>
                 <div>
+                  <label className={labelStyle}>State <span className="text-[#EF4444] ml-1">*</span></label>
                   {formData.country === 'India' ? (
-                    <select name="state" className={`${inputStyle} ${errors.state ? 'border-[#EF4444]' : ''}`} value={formData.state} onChange={handleStateChange}>
+                    <select name="state" className={`${inputStyle} ${errors.state ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.state} onChange={handleStateChange}>
                       <option value="" disabled>Select State</option>
                       {indiaStates.map((s, idx) => <option key={idx} value={s}>{s}</option>)}
                     </select>
                   ) : (
-                    <input type="text" name="state" placeholder="Enter State" value={formData.state} onChange={handleChange} className={`${inputStyle} ${errors.state ? 'border-[#EF4444]' : ''}`} disabled={!formData.country} />
+                    <input type="text" name="state" placeholder="Enter State" value={formData.state} onChange={handleChange} className={`${inputStyle} ${errors.state ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} disabled={!formData.country} />
                   )}
                   {errors.state && <p className={errorStyle}>{errors.state}</p>}
                 </div>
                 <div>
+                  <label className={labelStyle}>City <span className="text-[#EF4444] ml-1">*</span></label>
                   {formData.country === 'India' && availableCities.length > 0 ? (
-                    <select name="city" className={`${inputStyle} ${errors.city ? 'border-[#EF4444]' : ''}`} value={formData.city} onChange={handleChange}>
+                    <select name="city" className={`${inputStyle} ${errors.city ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} value={formData.city} onChange={handleChange}>
                       <option value="" disabled>Select City</option>
                       {availableCities.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
                     </select>
                   ) : (
-                    <input type="text" name="city" placeholder="Enter City" value={formData.city} onChange={handleChange} className={`${inputStyle} ${errors.city ? 'border-[#EF4444]' : ''}`} disabled={!formData.state} />
+                    <input type="text" name="city" placeholder="Enter City" value={formData.city} onChange={handleChange} className={`${inputStyle} ${errors.city ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/15' : ''}`} disabled={!formData.state} />
                   )}
                   {errors.city && <p className={errorStyle}>{errors.city}</p>}
                 </div>
@@ -379,7 +407,10 @@ export default function InvestorRegistration() {
             {/* --- 4. ABOUT --- */}
             <div className="mb-10">
               <h3 className={sectionHeadingStyle}>
-                <FileText className="w-5 h-5 mr-2 text-[#1F486E]" /> About the Investor / Firm
+                <div className="w-10 h-10 rounded-full bg-[#EA9F24]/10 flex items-center justify-center mr-3">
+                  <FileText className="w-5 h-5 text-[#EA9F24]" />
+                </div>
+                About the Investor / Firm
               </h3>
               <div className="space-y-6">
                 <div>
@@ -388,15 +419,15 @@ export default function InvestorRegistration() {
                 </div>
                 <div>
                   <label className={labelStyle}>Full Description <span className="text-[#64748B] font-normal ml-1">(Optional)</span></label>
-                  <textarea name="fullDescription" rows="4" className={`${inputStyle} resize-none`} value={formData.fullDescription} onChange={handleChange} placeholder="Detailed description..."></textarea>
+                  <textarea name="fullDescription" rows="4" className={`${inputStyle} resize-none min-h-[120px]`} value={formData.fullDescription} onChange={handleChange} placeholder="Detailed description..."></textarea>
                 </div>
               </div>
             </div>
 
             {/* --- 5. SECURITY (OPTIONAL CAPTCHA) --- */}
-            <div className="mt-8 bg-[#F8FAFC] p-6 rounded-[12px] border border-[#CBD5E1]/50 flex flex-col items-center">
-              <label className="text-[0.85rem] font-bold text-[#64748B] uppercase tracking-wider mb-4">
-                  Security Verification <span className="font-normal normal-case">(Optional)</span>
+            <div className="mt-8 bg-[#F0F6FB] p-6 rounded-[16px] border border-[#E2E8F0] flex flex-col items-center">
+              <label className="text-[0.85rem] font-bold text-[#15436B] uppercase tracking-wider mb-4">
+                  Security Verification <span className="font-medium normal-case text-[#64748B]">(Optional)</span>
               </label>
               
               {/* Uses the key from your .env file */}
@@ -412,10 +443,10 @@ export default function InvestorRegistration() {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center px-[50px] py-[18px] bg-[#1F486E] hover:bg-[#163654] text-white font-bold rounded-[50px] text-[1.1rem] shadow-[0_10px_25px_rgba(31,72,110,0.25)] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1"
+                className="inline-flex items-center justify-center px-[50px] py-[20px] bg-gradient-to-r from-[#EA9F24] to-[#D68A1B] hover:from-[#D68A1B] hover:to-[#B47012] text-white font-extrabold rounded-[50px] text-[1.1rem] shadow-[0_10px_30px_rgba(234,159,36,0.35)] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-1 w-full md:w-auto"
               >
                 {isSubmitting ? (
-                  <><span className="inline-block w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin mr-[10px] align-middle"></span> Processing...</>
+                  <><span className="inline-block w-[20px] h-[20px] border-2 border-white/30 border-t-white rounded-full animate-spin mr-[10px] align-middle"></span> Processing...</>
                 ) : (
                   <><Send className="w-5 h-5 mr-2" /> Register as Investor</>
                 )}

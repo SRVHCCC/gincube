@@ -7,9 +7,7 @@ import StatsAndCTA from "./components/StatsAndCTA";
 import WhoWeAre from "./components/Whoweare";
 import Services from "./components/Services";
 import GWEDCPage from "./components/GWEDCPage";
-
-import Contactpage from "./components/ContactPage";
-
+import ContactPage from "./components/ContactPage";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import StartupRegistration from "./pages/StartupRegistration";
@@ -18,6 +16,11 @@ import InvestorRegistration from "./pages/InvestorRegistration";
 import PartnerRegistration from "./pages/PartnerRegistration";
 import Privacy from "./components/Privacy";
 import TermsAndConditions from "./components/TermsConditions";
+import NewsEvents from "./components/NewsEvents"
+
+// 👇 Import your Chatbot component here (adjust the path if needed)
+import Chatbot from "./components/Chatbot";
+
 function Home() {
   return (
     <>
@@ -30,26 +33,30 @@ function Home() {
 
 function App() {
   return (
-    
     <div className="flex flex-col min-h-screen bg-sastik-dark text-sastik-textMain font-sans selection:bg-sastik-accent selection:text-white overflow-x-hidden">
       <Navbar />
 
       <ScrollToTop />
+      
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/who-we-are" element={<WhoWeAre />} />
           <Route path="/Services" element={<Services />} />
           <Route path="/GWEDC" element={<GWEDCPage />} />
-          <Route path="/contact-us" element={<Contactpage />} />
+          <Route path="/contact-us" element={<ContactPage />} />
           <Route path="/startup-registration" element={<StartupRegistration />} />
-        <Route path="/mentor-registration" element={<MentorRegistration />} />
-        <Route path="/investor-registration" element={<InvestorRegistration />} />
-        <Route path="/partner-registration" element={<PartnerRegistration />} />
-        <Route path="/privacy-policy" element={<Privacy />} />
-        <Route path="/terms-conditions" element={<TermsAndConditions />} />
+          <Route path="/mentor-registration" element={<MentorRegistration />} />
+          <Route path="/investor-registration" element={<InvestorRegistration />} />
+          <Route path="/partner-registration" element={<PartnerRegistration />} />
+          <Route path="/privacy-policy" element={<Privacy />} />
+          <Route path="/terms-conditions" element={<TermsAndConditions />} />
+          <Route path="/news-event" element={<NewsEvents />} />
         </Routes>
       </main>
+
+      {/* 👇 Chatbot yahan add kiya hai, ye fixed component ki tarah har page pe dikhega */}
+      <Chatbot />
 
       {/* Footer yahan har page ke end mein render hoga */}
       <Footer />

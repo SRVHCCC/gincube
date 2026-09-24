@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Lightbulb, Users, Banknote, Rocket, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { useRef } from 'react';
 
 // ─── Per-tab rich mock UI content ────────────────────────────────────────────
 const MentorshipUI = () => (
@@ -13,9 +12,9 @@ const MentorshipUI = () => (
     </div>
     {/* Mentor cards */}
     {[
-      { name: 'Priya Sharma', role: 'Ex-Zomato Product Head', avatar: 'PS', color: 'from-[#EA9F24] to-[#D68A1B]' }, // Orange
-      { name: 'Arjun Mehta', role: 'Founder, FinHive (YC W22)', avatar: 'AM', color: 'from-[#1C5A8F] to-[#287BBE]' }, // Lighter Blue
-      { name: 'Sneha Rathore', role: 'Angel Investor, 30+ exits', avatar: 'SR', color: 'from-[#0E2E4A] to-[#15436B]' }, // Dark Blue
+      { name: 'Priya Sharma', role: 'Ex-Zomato Product Head', avatar: 'PS', color: 'from-[#EA9F24] to-[#D68A1B]' }, // Golden Yellow
+      { name: 'Arjun Mehta', role: 'Founder, FinHive (YC W22)', avatar: 'AM', color: 'from-[#3B82F6] to-[#2563EB]' }, // Blue
+      { name: 'Sneha Rathore', role: 'Angel Investor, 30+ exits', avatar: 'SR', color: 'from-[#4F46E5] to-[#3730A3]' }, // Indigo
     ].map((m, i) => (
       <motion.div
         key={i}
@@ -47,7 +46,7 @@ const MentorshipUI = () => (
       className="mt-auto flex items-center gap-2 bg-white/20 rounded-xl px-4 py-2.5 border border-white/30"
     >
       <motion.div
-        className="w-2 h-2 rounded-full bg-[#EA9F24]" // Orange dot
+        className="w-2 h-2 rounded-full bg-[#EA9F24]" // Yellow dot
         animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       />
@@ -82,7 +81,7 @@ const FundingUI = () => {
       {/* Progress bar */}
       <div className="bg-white/20 rounded-full h-3 overflow-hidden">
         <motion.div
-          className="h-full bg-[#EA9F24] rounded-full" // Orange progress
+          className="h-full bg-[#EA9F24] rounded-full" // Yellow progress
           initial={{ width: 0 }}
           animate={{ width: `${bar}%` }}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -116,11 +115,11 @@ const WorkspaceUI = () => (
   <div className="flex flex-col gap-4 h-full">
     <div className="flex items-center justify-between">
       <p className="text-white/80 text-xs font-semibold uppercase tracking-wider">Campus Overview</p>
-      <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full font-semibold">Live</span>
+      <span className="text-xs bg-[#15436B]/20 text-[#15436B] px-3 py-1 rounded-full font-bold bg-white">Live</span>
     </div>
     {/* Seat grid */}
     <div>
-      <p className="text-white/60 text-xs mb-2">Hot Desk Availability</p>
+      <p className="text-white/80 text-xs mb-2 font-medium">Hot Desk Availability</p>
       <div className="grid grid-cols-8 gap-1.5">
         {Array.from({ length: 32 }).map((_, i) => {
           const occupied = [2, 5, 7, 8, 13, 14, 19, 22, 25].includes(i);
@@ -130,14 +129,14 @@ const WorkspaceUI = () => (
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.05 * i, type: 'spring', stiffness: 300 }}
-              className={`w-full aspect-square rounded-md ${occupied ? 'bg-white/30' : 'bg-white/90'}`}
+              className={`w-full aspect-square rounded-md ${occupied ? 'bg-white/30' : 'bg-white shadow-sm'}`}
             />
           );
         })}
       </div>
       <div className="flex gap-4 mt-2">
-        <span className="flex items-center gap-1 text-white/60 text-xs"><span className="w-2.5 h-2.5 rounded-sm bg-white/90 inline-block" />Available</span>
-        <span className="flex items-center gap-1 text-white/60 text-xs"><span className="w-2.5 h-2.5 rounded-sm bg-white/30 inline-block" />Occupied</span>
+        <span className="flex items-center gap-1 text-white/90 font-medium text-xs"><span className="w-2.5 h-2.5 rounded-sm bg-white inline-block" />Available</span>
+        <span className="flex items-center gap-1 text-white/70 font-medium text-xs"><span className="w-2.5 h-2.5 rounded-sm bg-white/30 inline-block" />Occupied</span>
       </div>
     </div>
     {/* Facilities */}
@@ -148,10 +147,10 @@ const WorkspaceUI = () => (
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 + i * 0.08 }}
-          className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-2"
+          className="flex items-center gap-2 bg-white/20 rounded-lg px-3 py-2 border border-white/10"
         >
-          <CheckCircle2 className="w-3.5 h-3.5 text-[#15436B] flex-shrink-0" /> {/* Blue Check inside Orange UI */}
-          <p className="text-white text-xs font-medium">{f}</p>
+          <CheckCircle2 className="w-3.5 h-3.5 text-white flex-shrink-0" />
+          <p className="text-white text-xs font-semibold">{f}</p>
         </motion.div>
       ))}
     </div>
@@ -172,7 +171,7 @@ const MarketUI = () => {
         {months.map((m, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
             <motion.div
-              className="w-full rounded-t-lg bg-[#EA9F24]" // Orange Bars
+              className="w-full rounded-t-lg bg-[#EA9F24]" // Yellow Bars on Navy bg
               initial={{ height: 0 }}
               animate={{ height: `${heights[i]}%` }}
               transition={{ delay: 0.1 + i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -217,7 +216,7 @@ const FeaturesTab = () => {
       title: 'Mentorship Program',
       description: 'Get guided by industry experts and experienced founders who have built successful scalable businesses.',
       icon: <Users className="w-5 h-5" />,
-      imageBg: 'from-[#15436B] to-[#1C5A8F]', // Navy Blue Gradient
+      imageBg: 'from-[#15436B] to-[#287BBE]', // Navy to Light Blue Gradient
       tag: 'Expert Guidance',
       ui: <MentorshipUI />,
       highlights: ['1-on-1 Weekly Sessions', 'Domain Experts', 'Peer Network'],
@@ -227,7 +226,7 @@ const FeaturesTab = () => {
       title: 'Funding & Grants',
       description: 'Access seed funding, government grants, and a network of angel investors and VC firms.',
       icon: <Banknote className="w-5 h-5" />,
-      imageBg: 'from-[#0E2E4A] to-[#15436B]', // Deep Navy Gradient
+      imageBg: 'from-[#1E1B4B] to-[#3730A3]', // Deep Indigo Gradient
       tag: 'Seed Capital',
       ui: <FundingUI />,
       highlights: ['Govt. Schemes', 'Angel Connect', 'Pitch Events'],
@@ -237,7 +236,7 @@ const FeaturesTab = () => {
       title: 'Workspace & Infrastructure',
       description: 'State-of-the-art co-working space with high-speed internet, meeting rooms, and prototyping labs.',
       icon: <Lightbulb className="w-5 h-5" />,
-      imageBg: 'from-[#EA9F24] to-[#D9821B]', // Golden Orange Gradient
+      imageBg: 'from-[#EA9F24] to-[#D68A1B]', // Strong Yellow/Amber Gradient!
       tag: 'Smart Campus',
       ui: <WorkspaceUI />,
       highlights: ['24×7 Access', 'Prototyping Lab', 'Dedicated Desks'],
@@ -247,7 +246,7 @@ const FeaturesTab = () => {
       title: 'Market Access',
       description: 'Strategic partnerships to help you test your product, acquire early adopters, and scale faster.',
       icon: <Rocket className="w-5 h-5" />,
-      imageBg: 'from-[#1C5A8F] to-[#287BBE]', // Lighter Blue Gradient
+      imageBg: 'from-[#0F172A] to-[#1E293B]', // Dark Slate Gradient
       tag: 'Growth',
       ui: <MarketUI />,
       highlights: ['Partner Network', 'GTM Strategy', 'B2G Connect'],
@@ -299,11 +298,11 @@ const FeaturesTab = () => {
           </motion.span>
           <motion.h2
             variants={itemVariants}
-            className="mt-3 text-3xl md:text-5xl font-extrabold text-[#0D1F2D] leading-tight"
+            className="mt-3 text-3xl md:text-5xl font-extrabold text-[#0A2236] leading-tight"
           >
             Everything you need to{' '}
             <br className="hidden md:block" />
-            <span className="text-[#15436B]">scale your startup.</span>
+            <span className="bg-gradient-to-r from-[#15436B] to-[#287BBE] bg-clip-text text-transparent">scale your startup.</span>
           </motion.h2>
           <motion.p
             variants={itemVariants}
@@ -336,7 +335,7 @@ const FeaturesTab = () => {
                       : 'bg-transparent border-transparent hover:bg-white/60 hover:border-[#E2E8F0]'
                   }`}
                 >
-                  {/* Active left bar (Orange) */}
+                  {/* Active left bar (Yellow Mix) */}
                   <AnimatePresence>
                     {isActive && (
                       <motion.div
@@ -355,8 +354,8 @@ const FeaturesTab = () => {
                     <motion.div
                       animate={{
                         scale: isActive ? 1.05 : 1,
-                        backgroundColor: isActive ? '#15436B' : 'rgb(241 245 249)', // Slate-100
-                        color: isActive ? '#fff' : '#64748B', // Slate-500
+                        backgroundColor: isActive ? '#15436B' : 'rgb(241 245 249)', // Navy vs Slate
+                        color: isActive ? '#fff' : '#64748B', 
                       }}
                       transition={{ duration: 0.3 }}
                       className="p-3 rounded-xl flex-shrink-0"
@@ -370,7 +369,7 @@ const FeaturesTab = () => {
                     <div className="flex-1 min-w-0">
                       <h3
                         className={`text-lg font-bold mb-1 transition-colors duration-300 ${
-                          isActive ? 'text-[#0D1F2D]' : 'text-[#64748B]'
+                          isActive ? 'text-[#0A2236]' : 'text-[#64748B]'
                         }`}
                       >
                         {feature.title}
@@ -387,7 +386,7 @@ const FeaturesTab = () => {
                             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                             className="overflow-hidden"
                           >
-                            <p className="text-[#475569] text-sm leading-relaxed mb-3">
+                            <p className="text-[#475569] text-sm leading-relaxed mb-3 mt-1">
                               {feature.description}
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -397,7 +396,7 @@ const FeaturesTab = () => {
                                   initial={{ opacity: 0, scale: 0.8 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ delay: 0.05 * i }}
-                                  className="inline-flex items-center gap-1 text-xs font-semibold bg-[#15436B]/10 text-[#15436B] px-3 py-1 rounded-full border border-[#15436B]/10"
+                                  className="inline-flex items-center gap-1 text-xs font-semibold bg-[#EA9F24]/10 text-[#D68A1B] px-3 py-1 rounded-full border border-[#EA9F24]/20"
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
                                   {h}
@@ -473,7 +472,7 @@ const FeaturesTab = () => {
               </div>
             </div>
 
-            {/* Below window: navigation dots */}
+            {/* Below window: navigation dots (Yellow active, Slate inactive) */}
             <div className="flex items-center justify-center gap-2 mt-5">
               {features.map((_, i) => (
                 <motion.button
@@ -481,7 +480,7 @@ const FeaturesTab = () => {
                   onClick={() => setActiveTab(i)}
                   animate={{ width: activeTab === i ? 24 : 8, opacity: activeTab === i ? 1 : 0.35 }}
                   transition={{ duration: 0.3 }}
-                  className={`h-2 rounded-full ${activeTab === i ? 'bg-[#15436B]' : 'bg-[#64748B]'}`}
+                  className={`h-2 rounded-full ${activeTab === i ? 'bg-[#EA9F24]' : 'bg-[#64748B]'}`}
                 />
               ))}
             </div>

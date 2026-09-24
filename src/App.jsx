@@ -7,6 +7,7 @@ import StatsAndCTA from "./components/StatsAndCTA";
 import WhoWeAre from "./components/Whoweare";
 import Services from "./components/Services";
 import GWEDCPage from "./components/GWEDCPage";
+
 import Contactpage from "./components/Contactpage";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";

@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useAnimation, animate } from 'framer-motion';
 // ADDED: Import Link from react-router-dom
 import { Link } from 'react-router-dom';
-import API_URL from "./Config"; // Added API Config
+import API_URL from "./config"; // Added API Config
 
 // Create a motion-enabled Link component
 const MotionLink = motion(Link);

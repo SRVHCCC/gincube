@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useAnimation, animate } from 'framer-motion';
-import API_URL from "../components/Config"; // Load API URL from Config
+import API_URL from "../components/config"; // Load API URL from Config
 
 /* ─────────────────────────────────────────
    BRAND TOKENS (Modernized Navy Blue & Golden Orange)

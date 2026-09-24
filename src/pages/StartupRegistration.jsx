@@ -202,10 +202,11 @@ export default function StartupRegistration() {
                                     <select name="stage" required className={inputStyle} value={formData.stage} onChange={handleChange}>
                                         <option value="" disabled>Select Stage</option>
                                         <option value="Ideation">Ideation</option>
-                                        <option value="MVP">MVP / Proof of Concept</option>
-                                        <option value="Beta_Launched">Beta Launched</option>
-                                        <option value="Early_Revenues">Early Revenues</option>
-                                        <option value="Steady_Revenues">Steady Revenues</option>
+                                        <option value="Validation">Validation</option>
+                                        <option value="First Traction">First Traction</option>
+                                        <option value="Early Traction">Early Traction</option>
+                                        <option value="Product-Market Fit">Product-Market Fit</option>
+                                        <option value="Growth">Growth</option>
                                     </select>
                                 </div>
                                 <div>
@@ -302,7 +303,6 @@ export default function StartupRegistration() {
                                 Security Verification <span className="font-normal normal-case">(Optional)</span>
                             </label>
                             
-                            {/* Uses the key from your .env file */}
                             <ReCAPTCHA
                                 ref={recaptchaRef}
                                 sitekey={import.meta.env.VITE_RECAPTCHA_KEY || "YOUR_FALLBACK_SITE_KEY_IF_ENV_IS_MISSING"}

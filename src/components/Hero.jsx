@@ -3,8 +3,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 // Ensure you have these assets in your project, including the fort silhouettes
-// import ruchikaImg from '../assets/gincube_ruchika.jpeg';
-// import abhishekImg from '../assets/gincub_abhisek.jpeg';
+import ruchikaImg from '../assets/gincube_ruchika.jpeg';
+import abhishekImg from '../assets/gincub_abhisek.jpeg';
 // import leftFortImg from '../assets/left_fort.png'; 
 // import rightFortImg from '../assets/right_fort.png';
 

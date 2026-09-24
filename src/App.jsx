@@ -2,21 +2,21 @@ import { Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import FeaturesTab from "./components/FeaturesTab";
-import StatsAndCTA from "./components/StatsAndCTA";
+import FeaturesTab from "./components/Featurestab";
+import StatsAndCTA from "./components/Statsandcta";
 import WhoWeAre from "./components/Whoweare";
 import Services from "./components/Services";
-import GWEDCPage from "./components/GWEDCPage";
+import GWEDCPage from "./components/GWEDCpage";
 import ContactPage from "./components/Contactpage";
 import Footer from "./components/Footer";
-import ScrollToTop from "./components/ScrollToTop";
-import StartupRegistration from "./pages/StartupRegistration";
-import MentorRegistration from "./pages/MentorRegistration";
-import InvestorRegistration from "./pages/InvestorRegistration";
-import PartnerRegistration from "./pages/PartnerRegistration";
+import ScrollToTop from "./components/Scrolltotop";
+import StartupRegistration from "./pages/Startupregistration";
+import MentorRegistration from "./pages/Mentorregistration";
+import InvestorRegistration from "./pages/Investorregistration";
+import PartnerRegistration from "./pages/Partnerregistration";
 import Privacy from "./components/Privacy";
-import TermsAndConditions from "./components/TermsConditions";
-import NewsEvents from "./components/NewsEvents"
+import TermsAndConditions from "./components/Termsconditions";
+import NewsEvents from "./components/Newsevents"
 
 // 👇 Import your Chatbot component here (adjust the path if needed)
 import Chatbot from "./components/Chatbot";
